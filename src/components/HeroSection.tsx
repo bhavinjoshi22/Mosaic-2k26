@@ -28,7 +28,11 @@ function useFitFontSize(text: string) {
       const textWidth = textEl.scrollWidth;
       const containerWidth = container.clientWidth;
       if (textWidth > 0) {
-        setFontSize((containerWidth / textWidth) * baseline);
+        const size = Math.floor((containerWidth / textWidth) * baseline);
+        // set directly too: React skips re-render when the value is unchanged,
+        // which would leave the imperative 200px baseline stuck on screen
+        textEl.style.fontSize = `${size}px`;
+        setFontSize(size);
       }
     };
     recalc();
