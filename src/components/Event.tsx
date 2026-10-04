@@ -241,7 +241,7 @@ function TerminalCard({ project }: { project: Project; index: number }) {
           {project.posts.map((post, postIndex) => (
             <div
               key={`${project.number}-${postIndex}`}
-              className="relative h-[clamp(180px,22vw,340px)] overflow-hidden rounded-2xl border border-white/10 bg-[#111]"
+              className="relative h-[240px] sm:h-[clamp(180px,22vw,340px)] overflow-hidden rounded-2xl border border-white/10 bg-[#111]"
             >
               <PostMedia post={post} alt={`${project.name} post ${postIndex + 1}`} />
             </div>

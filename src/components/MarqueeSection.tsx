@@ -56,7 +56,8 @@ export default function MarqueeSection() {
 
       const sectionTop = section.getBoundingClientRect().top + window.scrollY;
       const scrollProgress = window.scrollY - sectionTop;
-      setOffset(Math.max(-80, Math.min(80, scrollProgress * 0.24)));
+      const max = window.innerWidth < 640 ? 10 : 80;
+      setOffset(Math.max(-max, Math.min(max, scrollProgress * 0.24)));
     };
 
     handleScroll();
@@ -65,7 +66,7 @@ export default function MarqueeSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="w-full overflow-hidden bg-[#0C0C0C] pb-10 pt-24 sm:pt-32 md:pt-40">
+    <section ref={sectionRef} className="w-full overflow-hidden bg-[#0C0C0C] px-3 pb-10 pt-24 sm:pt-32 md:pt-40">
       <div className="flex flex-col gap-3">
         {ROWS.map((row, rowIndex) => (
           <div

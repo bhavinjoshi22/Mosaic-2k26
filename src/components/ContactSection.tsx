@@ -30,6 +30,14 @@ const AUTOPLAY_INTERVAL = 2500;
 
 export default function ContactSection() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
 
   useEffect(() => {
@@ -54,7 +62,7 @@ export default function ContactSection() {
         </div>
 
         {/* Horizontal cover-flow stack, auto-playing */}
-        <div className="relative h-[720px] overflow-hidden">
+        <div className="relative h-[600px] overflow-hidden sm:h-[720px]">
           {COUNCIL_MEMBERS.map((member, i) => {
             const total = COUNCIL_MEMBERS.length;
 
@@ -63,15 +71,15 @@ export default function ContactSection() {
             if (offset < -total / 2) offset += total;
             const abs = Math.abs(offset);
             const isActive = offset === 0;
-            const visible = abs <= 2;
+            const visible = abs <= (isMobile ? 0 : 2);
 
             return (
               <motion.div
                 key={i}
-                className="absolute left-1/2 top-1/2 w-[340px] sm:w-[420px]"
+                className="absolute left-1/2 top-1/2 w-[min(340px,88vw)] sm:w-[420px]"
                 style={{ zIndex: 10 - abs }}
                 animate={{
-                  x: `calc(-50% + ${offset * STACK_GAP}px)`,
+                  x: `calc(-50% + ${offset * (isMobile ? 0 : STACK_GAP)}px)`,
                   y: "-50%",
                   scale: isActive ? 1 : 0.8,
                   opacity: visible ? (isActive ? 1 : 0.35) : 0,

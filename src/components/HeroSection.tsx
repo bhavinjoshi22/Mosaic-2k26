@@ -32,6 +32,7 @@ function useFitFontSize(text: string) {
       }
     };
     recalc();
+    document.fonts?.ready.then(recalc); // re-measure once Kanit has loaded
     window.addEventListener('resize', recalc);
     return () => window.removeEventListener('resize', recalc);
   }, [text]);
@@ -47,7 +48,7 @@ export default function HeroSection({ onRegisterClick }: HeroSectionProps) {
   const { containerRef, textRef, fontSize } = useFitFontSize(HERO_TITLE);
 
   return (
-    <section className="relative flex h-screen flex-col" style={{ overflowX: 'clip' }}>
+    <section className="relative flex min-h-[100svh] flex-col" style={{ overflowX: 'clip' }}>
       <HeroBackground />
       {/*
         All 5 items (4 links + NavAuthSection) are direct children of this
@@ -55,12 +56,12 @@ export default function HeroSection({ onRegisterClick }: HeroSectionProps) {
         NavAuthSection — that's what spreads them evenly across the full
         width instead of clustering the links together on the left.
       */}
-      <nav className="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-4 border-b border-[#D7E2EA]/20 bg-[#0C0C0C]/80 px-6 py-4 backdrop-blur-md md:px-10 md:py-5">
+      <nav className="sticky top-0 z-20 flex flex-nowrap items-center justify-between gap-2 border-b border-[#D7E2EA]/20 bg-[#0C0C0C]/80 px-4 py-3 backdrop-blur-md sm:px-6 md:px-10 md:py-5">
         {NAV_LINKS.map((link, i) => (
           <FadeIn key={link.label} delay={i * 0.05} y={-20} className="inline-block">
             <a
               href={link.href}
-              className="text-sm font-medium uppercase tracking-wider text-[#D7E2EA] transition-opacity duration-200 hover:opacity-70 md:text-lg lg:text-[1.4rem]"
+              className="text-[11px] font-medium uppercase tracking-normal text-[#D7E2EA] transition-opacity duration-200 hover:opacity-70 sm:text-sm sm:tracking-wider md:text-lg lg:text-[1.4rem]"
             >
               {link.label}
             </a>
@@ -87,7 +88,7 @@ export default function HeroSection({ onRegisterClick }: HeroSectionProps) {
           <FadeIn delay={0.2} y={40} as="div">
             <h1
               ref={textRef}
-              className="hero-heading w-full whitespace-nowrap text-center font-black uppercase leading-none tracking-tight"
+              className="hero-heading inline-block whitespace-nowrap text-center font-black uppercase leading-none tracking-tight"
               style={{ fontSize: `${fontSize}px` }}
             >
               {HERO_TITLE}

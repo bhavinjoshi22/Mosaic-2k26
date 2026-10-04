@@ -25,7 +25,7 @@ export default function AboutSection() {
           </p>
           <h2
             className="hero-heading font-black uppercase leading-none tracking-tight"
-            style={{ fontSize: 'clamp(4.5rem, 10vw, 170px)' }}
+            style={{ fontSize: 'clamp(2.75rem, 12vw, 170px)' }}
           >
             About Us
           </h2>
@@ -83,12 +83,12 @@ export default function AboutSection() {
             whileInView={{ opacity: 1, scale: 1, y: 0 }}
             viewport={{ once: true, amount: 0.25 }}
             transition={{ duration: 0.8, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
-            className="flex -translate-y-4 items-center justify-center lg:justify-end"
+            className="flex w-full -translate-y-4 items-center justify-center lg:justify-end"
           >
             <motion.div
               animate={{ y: [0, -10, 0] }}
               transition={{ duration: 5, ease: 'easeInOut', repeat: Infinity }}
-              className="relative"
+              className="relative w-full max-w-[680px]"
             >
               <div
                 className="relative rounded-[42px] border-[3px] border-[#73787d] bg-[#272b2f] p-2 shadow-[0_30px_90px_rgba(0,0,0,0.7),inset_0_0_0_2px_rgba(255,255,255,0.18)] sm:rounded-[52px] sm:p-3"
@@ -104,7 +104,7 @@ export default function AboutSection() {
                 <div className="relative overflow-hidden rounded-[34px] border-2 border-black/70 bg-black shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12)] sm:rounded-[43px]">
                   <div className="absolute left-1/2 top-2 z-10 h-5 w-24 -translate-x-1/2 rounded-full bg-black shadow-[0_1px_3px_rgba(255,255,255,0.18)] sm:top-3 sm:h-6 sm:w-28" />
                   <div className="absolute bottom-2 left-1/2 z-10 h-1 w-24 -translate-x-1/2 rounded-full bg-white/70 sm:bottom-3 sm:w-28" />
-                  <div className="relative aspect-video w-[360px] overflow-hidden sm:w-[480px] md:w-[600px] lg:w-[680px]">
+                  <div className="relative aspect-video w-full overflow-hidden">
                     <video
                       className="absolute inset-0 h-full w-full object-cover"
                       src="/About-us.mp4"

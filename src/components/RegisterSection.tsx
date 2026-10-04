@@ -268,7 +268,7 @@ export default function RegisterSection({ isOpen, onClose }: RegisterSectionProp
             'linear-gradient(135deg, rgba(215,226,234,0.28) 0%, rgba(215,226,234,0.08) 40%, rgba(215,226,234,0.05) 65%, rgba(227,162,76,0.4) 100%)',
         }}
       >
-        <div className="relative flex max-h-[92vh] flex-col overflow-hidden rounded-[23px] bg-[#0C0C0C]">
+        <div className="relative flex max-h-[92dvh] flex-col overflow-hidden rounded-[23px] bg-[#0C0C0C]">
           {/* terminal-style title bar, echoing the committee cards */}
           <div className="flex shrink-0 items-center justify-between border-b border-[#D7E2EA]/10 bg-[#111113] px-4 py-3">
             <div className="flex items-center gap-2">

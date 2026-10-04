@@ -80,7 +80,7 @@ export default function ProfileDropdown() {
             {displayName.charAt(0).toUpperCase()}
           </span>
         )}
-        <span className="max-w-[110px] truncate text-sm text-[#D7E2EA]">{displayName}</span>
+        <span className="hidden max-w-[110px] truncate text-sm text-[#D7E2EA] sm:inline">{displayName}</span>
       </button>
 
       <AnimatePresence>
