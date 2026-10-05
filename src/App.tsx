@@ -56,7 +56,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0C0C0C]" style={{ overflowX: 'clip' }}>
+    <div className="min-h-screen bg-[#0C0C0C] pb-20 lg:pb-0" style={{ overflowX: 'clip' }}>
       <SideNav onRegisterClick={() => setShowRegister(true)} />
       <SocialSidebar />
       <HeroSection onRegisterClick={() => setShowRegister(true)} />

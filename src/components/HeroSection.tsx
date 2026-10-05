@@ -1,4 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Menu, X } from 'lucide-react';
 import FadeIn from './FadeIn';
 import NavAuthSection from './NavAuthSection';
 import HeroBackground from './HeroBackground';
@@ -50,6 +52,7 @@ interface HeroSectionProps {
 
 export default function HeroSection({ onRegisterClick }: HeroSectionProps) {
   const { containerRef, textRef, fontSize } = useFitFontSize(HERO_TITLE);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <section className="relative flex min-h-[100svh] flex-col" style={{ overflowX: 'clip' }}>
@@ -60,21 +63,67 @@ export default function HeroSection({ onRegisterClick }: HeroSectionProps) {
         NavAuthSection — that's what spreads them evenly across the full
         width instead of clustering the links together on the left.
       */}
-      <nav className="sticky top-0 z-20 flex flex-nowrap items-center justify-between gap-2 border-b border-[#D7E2EA]/20 bg-[#0C0C0C]/80 px-4 py-3 backdrop-blur-md sm:px-6 md:px-10 md:py-5">
+      <nav className="sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-[#D7E2EA]/20 bg-[#0C0C0C]/80 px-4 py-3 backdrop-blur-md sm:px-6 md:px-10 md:py-5">
+        {/* mobile: brand on the left */}
+        <a href="#" className="text-sm font-black uppercase tracking-widest text-[#D7E2EA] md:hidden">
+          MOSAIC-2K26
+        </a>
+
+        {/* md+: links spread across the bar */}
         {NAV_LINKS.map((link, i) => (
-          <FadeIn key={link.label} delay={i * 0.05} y={-20} className="inline-block">
+          <FadeIn key={link.label} delay={i * 0.05} y={-20} className="hidden md:inline-block">
             <a
               href={link.href}
-              className="text-[11px] font-medium uppercase tracking-normal text-[#D7E2EA] transition-opacity duration-200 hover:opacity-70 sm:text-sm sm:tracking-wider md:text-lg lg:text-[1.4rem]"
+              className="text-lg font-medium uppercase tracking-wider text-[#D7E2EA] transition-opacity duration-200 hover:opacity-70 lg:text-[1.4rem]"
             >
               {link.label}
             </a>
           </FadeIn>
         ))}
 
-        <FadeIn delay={NAV_LINKS.length * 0.05} y={-20} className="inline-block">
-          <NavAuthSection />
-        </FadeIn>
+        <div className="flex items-center gap-3">
+          <FadeIn delay={NAV_LINKS.length * 0.05} y={-20} className="inline-block">
+            <NavAuthSection />
+          </FadeIn>
+
+          {/* mobile: hamburger */}
+          <button
+            type="button"
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#D7E2EA]/20 bg-[#151515] text-[#D7E2EA] md:hidden"
+          >
+            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
+
+        {/* mobile dropdown */}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.18 }}
+              className="absolute inset-x-0 top-full border-b border-[#D7E2EA]/20 bg-[#0C0C0C]/95 backdrop-blur-xl md:hidden"
+            >
+              <ul className="flex flex-col px-4 py-2 sm:px-6">
+                {NAV_LINKS.map((link) => (
+                  <li key={link.label} className="border-b border-[#D7E2EA]/10 last:border-b-0">
+                    <a
+                      href={link.href}
+                      onClick={() => setMenuOpen(false)}
+                      className="block py-3.5 text-sm font-medium uppercase tracking-widest text-[#D7E2EA]/90 transition-colors active:text-white"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center gap-6 px-5 text-center sm:gap-7 md:gap-8">

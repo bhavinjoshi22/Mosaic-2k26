@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, type MotionValue } from 'framer-motion';
 import { Home, CalendarDays, Phone, Info, UserPlus } from 'lucide-react';
 
@@ -88,12 +88,108 @@ function NavItem({
   );
 }
 
+
+// ---------------------------------------------------------------------------
+// Mobile / tablet: app-style bottom tab bar (replaces the side dock below lg)
+// ---------------------------------------------------------------------------
+function useActiveSection() {
+  const [active, setActive] = useState('#');
+
+  useEffect(() => {
+    const els = ['about', 'events', 'contact']
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) setActive(`#${e.target.id}`);
+        });
+      },
+      { rootMargin: '-45% 0px -45% 0px' }
+    );
+    els.forEach((el) => io.observe(el));
+
+    const onScroll = () => {
+      if (window.scrollY < window.innerHeight * 0.4) setActive('#');
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    return () => {
+      io.disconnect();
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, []);
+
+  return active;
+}
+
+function BottomNav({ onRegisterClick }: SideNavProps) {
+  const active = useActiveSection();
+
+  return (
+    <nav
+      aria-label="Section navigation"
+      className="fixed inset-x-0 bottom-0 z-30 border-t border-[#D7E2EA]/15 bg-[#0C0C0C]/90 backdrop-blur-xl lg:hidden"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+    >
+      <ul className="mx-auto grid max-w-md grid-cols-5">
+        {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
+          const isRegister = label === 'Register';
+          const isActive = !isRegister && active === href;
+
+          return (
+            <li key={label}>
+              <a
+                href={href}
+                onClick={(e) => {
+                  if (isRegister) {
+                    e.preventDefault();
+                    onRegisterClick();
+                  }
+                }}
+                aria-label={label}
+                aria-current={isActive ? 'page' : undefined}
+                className={`flex flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-medium uppercase tracking-wider transition-colors active:scale-95 ${
+                  isActive ? 'text-white' : 'text-[#D7E2EA]/55'
+                }`}
+              >
+                {isRegister ? (
+                  <span
+                    className="rounded-full p-[1.5px]"
+                    style={{ background: 'linear-gradient(135deg, #B600A8 0%, #7621B0 50%, #BE4C00 100%)' }}
+                  >
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0C0C0C] text-[#D7E2EA]">
+                      <Icon className="h-4 w-4" strokeWidth={1.75} />
+                    </span>
+                  </span>
+                ) : (
+                  <span
+                    className={`flex h-8 w-12 items-center justify-center rounded-full transition-colors ${
+                      isActive ? 'bg-[#D7E2EA]/15' : ''
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" strokeWidth={1.75} />
+                  </span>
+                )}
+                <span>{label}</span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+}
+
 export default function SideNav({ onRegisterClick }: SideNavProps) {
   // Infinity keeps every icon at rest (distance always exceeds
   // MAGNETIC_DISTANCE) until the cursor actually enters the dock.
   const mouseY = useMotionValue(Infinity);
 
   return (
+    <>
+      <BottomNav onRegisterClick={onRegisterClick} />
     <nav
       onMouseMove={(e) => mouseY.set(e.clientY)}
       onMouseLeave={() => mouseY.set(Infinity)}
@@ -115,5 +211,6 @@ export default function SideNav({ onRegisterClick }: SideNavProps) {
         />
       ))}
     </nav>
+    </>
   );
 }
