@@ -8,16 +8,12 @@ import RegisterSection from './components/RegisterSection';
 import SideNav from './components/SideNav';
 import SocialSidebar from './components/SocialSidebar';
 import AdminDashboardPage from './components/AdminDashboardPage';
-import { useAuth } from './hooks/useAuth';
-import { supabase } from './components/supabase';
 
 function App() {
-  const { user, loading } = useAuth();
   const [showRegister, setShowRegister] = useState(false);
   const [showAdmin, setShowAdmin] = useState(() => {
     return window.location.hash === '#admin' || window.location.pathname === '/admin';
   });
-  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const syncAdminView = () => {
@@ -34,24 +30,7 @@ function App() {
     };
   }, []);
 
-  useEffect(() => {
-    if (loading || !user) {
-      setIsAdmin(false);
-      return;
-    }
-
-    let cancelled = false;
-
-    supabase.functions.invoke('check-volunteer').then(({ data }) => {
-      if (!cancelled) setIsAdmin(data?.isAdmin === true);
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [loading, user]);
-
-  if (showAdmin || isAdmin) {
+  if (showAdmin) {
     return <AdminDashboardPage />;
   }
 

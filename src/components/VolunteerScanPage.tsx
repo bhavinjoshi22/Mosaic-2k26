@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { supabase } from './supabase'; // adjust path if this file lives elsewhere
 import { useAuth } from '../hooks/useAuth'; // same hook the rest of the app uses
+import { useRole } from '../hooks/UseRole';
 
 // This page is completely self-contained — it doesn't import or touch any
 // other component in the app (SideNav, HeroSection, RegisterSection, etc.),
@@ -47,10 +48,12 @@ interface LiveCheckin {
 export default function VolunteerScanPage() {
   const { user, loading: authLoading, signInWithGoogle, signOut } = useAuth();
 
-  // null = not checked yet, true/false = result of check-volunteer
-  const [isVolunteer, setIsVolunteer] = useState<boolean | null>(null);
-  // 'gate' or a committee name, filled in once check-volunteer resolves
-  const [role, setRole] = useState<string | null>(null);
+  // Role comes from the shared, cached check (see hooks/useRole.ts) —
+  // no second check-volunteer round trip, and refreshes open instantly.
+  const { info, pending } = useRole();
+  const isVolunteer: boolean | null = info ? info.isVolunteer : pending ? null : false;
+  // 'gate' or a committee name
+  const role: string | null = info?.isVolunteer ? (info.role ?? 'gate') : null;
 
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState<ScanResult | null>(null);
@@ -74,38 +77,22 @@ export default function VolunteerScanPage() {
     }
   }
 
-  // Right after login, check whether this email is on the volunteer list.
-  // If not, this page has nothing to offer them — send them to the normal
-  // site instead of showing an error screen, same as "just being a regular
-  // logged-in user" would look like.
+  // Logged out: reset everything tied to the previous session.
   useEffect(() => {
-    if (authLoading) return;
-    if (!user) {
-      setIsVolunteer(null);
-      // Reset everything tied to the previous session so that logging back
-      // in always re-checks the role and re-loads the live check-ins fresh
-      // from the database (the data itself is never lost on logout).
-      setRole(null);
-      setResult(null);
-      setLookupError(null);
-      setLiveCheckins([]);
-      setLiveLoaded(false);
-      return;
-    }
-    let cancelled = false;
-    supabase.functions.invoke('check-volunteer', {}).then(({ data }) => {
-      if (cancelled) return;
-      if (data?.isVolunteer) {
-        setIsVolunteer(true);
-        setRole(data.role ?? 'gate');
-      } else {
-        window.location.href = '/';
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
+    if (authLoading || user) return;
+    setResult(null);
+    setLookupError(null);
+    setLiveCheckins([]);
+    setLiveLoaded(false);
   }, [user, authLoading]);
+
+  // Logged in but not on the volunteer list: nothing to offer here, send
+  // them to the normal site.
+  useEffect(() => {
+    if (!authLoading && user && info && !info.isVolunteer) {
+      window.location.href = '/';
+    }
+  }, [user, authLoading, info]);
 
   // Once we know this volunteer's committee, load their existing
   // check-ins and then subscribe to new ones live. RLS (see
@@ -113,7 +100,7 @@ export default function VolunteerScanPage() {
   // for THIS committee — gate volunteers' `role` matches no committee, so
   // this naturally fetches/streams nothing for them.
   useEffect(() => {
-    if (!role || role === 'gate') return;
+    if (!role || role === 'gate' || !user) return;
 
     let cancelled = false;
 
@@ -145,7 +132,7 @@ export default function VolunteerScanPage() {
       cancelled = true;
       supabase.removeChannel(channel);
     };
-  }, [role]);
+  }, [role, user?.id]);
 
   async function handleLogout() {
     stopScanner();
@@ -246,11 +233,11 @@ export default function VolunteerScanPage() {
 
   // ---------- render ----------
 
-  if (authLoading) {
+  if (authLoading && !info) {
     return <div style={styles.centered}>Loading…</div>;
   }
 
-  if (!user) {
+  if (!user && !authLoading) {
     return (
       <div style={styles.centered}>
         <h1 style={styles.title}>Volunteer Login</h1>

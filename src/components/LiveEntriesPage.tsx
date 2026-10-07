@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from './supabase'; // adjust path if this file lives elsewhere
 import { useAuth } from '../hooks/useAuth';
+import { useRole } from '../hooks/UseRole';
 
 // Opens in its own tab when a committee volunteer clicks "View
 // Registrations" on their scan screen — a plain, Excel-style table of
@@ -24,31 +25,15 @@ interface LiveCheckin {
 
 export default function LiveEntriesPage() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
-  const [role, setRole] = useState<string | null>(null);
-  const [roleChecked, setRoleChecked] = useState(false);
+  const { info, pending } = useRole();
+  const role: string | null = info?.isVolunteer ? (info.role ?? null) : null;
+  const roleChecked = !!info || !pending;
   const [checkins, setCheckins] = useState<LiveCheckin[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [flashId, setFlashId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (authLoading) return;
-    if (!user) {
-      setRoleChecked(true);
-      return;
-    }
-    let cancelled = false;
-    supabase.functions.invoke('check-volunteer').then(({ data }) => {
-      if (cancelled) return;
-      setRole(data?.isVolunteer ? (data.role ?? null) : null);
-      setRoleChecked(true);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [user, authLoading]);
-
-  useEffect(() => {
-    if (!role || role === 'gate') return;
+    if (!role || role === 'gate' || !user) return;
 
     let cancelled = false;
 
@@ -82,15 +67,15 @@ export default function LiveEntriesPage() {
       cancelled = true;
       supabase.removeChannel(channel);
     };
-  }, [role]);
+  }, [role, user?.id]);
 
   // ---------- auth / role gates ----------
 
-  if (authLoading || !roleChecked) {
+  if ((authLoading && !info) || !roleChecked) {
     return <div style={styles.centered}>Loading…</div>;
   }
 
-  if (!user) {
+  if (!user && !authLoading) {
     return (
       <div style={styles.centered}>
         <h1 style={styles.gateTitle}>Login Required</h1>

@@ -1,6 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from './supabase'; // adjust path if this file lives elsewhere
 import { useAuth } from '../hooks/useAuth';
+import { useRole } from '../hooks/UseRole';
+
+function useIsMobile(max = 640) {
+  const [m, setM] = useState(() => typeof window !== 'undefined' && window.innerWidth < max);
+  useEffect(() => {
+    const on = () => setM(window.innerWidth < max);
+    window.addEventListener('resize', on);
+    return () => window.removeEventListener('resize', on);
+  }, [max]);
+  return m;
+}
 
 // Owner-only view: every committee's check-ins AND gate entries, live, in
 // one place — plus full manual override controls (add, edit, delete a
@@ -34,7 +45,11 @@ interface GateRow {
 
 export default function AdminDashboardPage() {
   const { user, loading: authLoading, signInWithGoogle, signOut } = useAuth();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const { info, pending } = useRole();
+  const isAdmin: boolean | null = info ? info.isAdmin : pending ? null : false;
+  const isMobile = useIsMobile();
+  const S = (key: string, mobile?: React.CSSProperties): React.CSSProperties =>
+    isMobile && mobile ? { ...styles[key], ...mobile } : styles[key];
 
   const [rows, setRows] = useState<CheckinRow[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -62,24 +77,9 @@ export default function AdminDashboardPage() {
   const [gateBusy, setGateBusy] = useState(false);
   const [gateMessage, setGateMessage] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user) {
-      setIsAdmin(null);
-      return;
-    }
-    let cancelled = false;
-    supabase.functions.invoke('check-volunteer').then(({ data }) => {
-      if (!cancelled) setIsAdmin(data?.isAdmin === true);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [user, authLoading]);
-
   // ───────── committee check-ins: initial load + live stream ─────────
   useEffect(() => {
-    if (!isAdmin) return;
+    if (!isAdmin || !user) return;
     let cancelled = false;
 
     supabase
@@ -113,13 +113,13 @@ export default function AdminDashboardPage() {
       cancelled = true;
       supabase.removeChannel(channel);
     };
-  }, [isAdmin]);
+  }, [isAdmin, user?.id]);
 
   // ───────── gate entries: initial load + live stream ─────────
   // Needs `alter publication supabase_realtime add table public.registrations;`
   // (see enable-gate-realtime.sql) for the live part to work.
   useEffect(() => {
-    if (!isAdmin) return;
+    if (!isAdmin || !user) return;
     let cancelled = false;
 
     supabase
@@ -149,7 +149,7 @@ export default function AdminDashboardPage() {
       cancelled = true;
       supabase.removeChannel(channel);
     };
-  }, [isAdmin]);
+  }, [isAdmin, user?.id]);
 
   async function handleLogout() {
     await signOut();
@@ -288,9 +288,9 @@ export default function AdminDashboardPage() {
 
   // ---------- auth gates ----------
 
-  if (authLoading) return <div style={styles.centered}>Loading…</div>;
+  if (authLoading && !info) return <div style={styles.centered}>Loading…</div>;
 
-  if (!user) {
+  if (!user && !authLoading) {
     return (
       <div style={styles.centered}>
         <h1 style={styles.gateTitle}>Admin Login</h1>
@@ -317,16 +317,16 @@ export default function AdminDashboardPage() {
   const showingGate = filter === GATE_KEY;
 
   return (
-    <div style={styles.page}>
-      <div style={styles.header}>
+    <div style={S('page', { padding: '16px 12px 60px' })}>
+      <div style={S('header', { marginBottom: 14 })}>
         <div>
-          <h1 style={styles.title}>Mosaic 2K26 · Admin</h1>
+          <h1 style={S('title', { fontSize: 18 })}>Mosaic 2K26 · Admin</h1>
           <span style={styles.totalBadge}>
             {loaded ? rows.length : '…'} committee check-ins · {gateLoaded ? gateRows.length : '…'} gate entries
           </span>
         </div>
-        <div style={styles.headerRight}>
-          <span style={styles.adminEmail}>{user.email}</span>
+        <div style={S('headerRight', { width: '100%', justifyContent: 'space-between' })}>
+          <span style={S('adminEmail', { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 })}>{user?.email}</span>
           <button onClick={handleLogout} style={styles.logoutButton}>
             Log out
           </button>
@@ -334,16 +334,16 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* ───────── manual overrides ───────── */}
-      <div style={styles.overridePanel}>
+      <div style={S('overridePanel', { gridTemplateColumns: '1fr', gap: 10 })}>
         <form onSubmit={handleManualAdd} style={styles.overrideForm}>
           <p style={styles.overrideLabel}>Manually add a check-in</p>
-          <div style={styles.overrideRow}>
-            <input value={addCode} onChange={(e) => setAddCode(e.target.value)} placeholder="Entry code" style={styles.input} />
+          <div style={S('overrideRow', { flexWrap: 'wrap' })}>
+            <input value={addCode} onChange={(e) => setAddCode(e.target.value)} placeholder="Entry code" style={S('input', { flex: '1 1 130px' })} />
             <input
               value={addCommittee}
               onChange={(e) => setAddCommittee(e.target.value)}
               placeholder="Committee (e.g. CODEX)"
-              style={styles.input}
+              style={S('input', { flex: '1 1 130px' })}
             />
             <button type="submit" disabled={addBusy} style={styles.actionButton}>
               {addBusy ? '…' : 'Add'}
@@ -354,14 +354,14 @@ export default function AdminDashboardPage() {
 
         <form onSubmit={handleGateLookup} style={styles.overrideForm}>
           <p style={styles.overrideLabel}>Look up / override by entry code</p>
-          <div style={styles.overrideRow}>
-            <input value={gateCode} onChange={(e) => setGateCode(e.target.value)} placeholder="Entry code" style={styles.input} />
+          <div style={S('overrideRow', { flexWrap: 'wrap' })}>
+            <input value={gateCode} onChange={(e) => setGateCode(e.target.value)} placeholder="Entry code" style={S('input', { flex: '1 1 130px' })} />
             <button type="submit" disabled={gateBusy} style={styles.actionButton}>
               {gateBusy ? '…' : 'Look up'}
             </button>
           </div>
           {gateLookup && (
-            <div style={styles.gateResultRow}>
+            <div style={S('gateResultRow', { flexWrap: 'wrap' })}>
               <span>
                 {gateLookup.name} — currently{' '}
                 <strong style={{ color: gateLookup.checked_in ? '#4ade80' : '#f87171' }}>
@@ -390,7 +390,7 @@ export default function AdminDashboardPage() {
           id="committee-select"
           value={filter ?? ''}
           onChange={(e) => setFilter(e.target.value === '' ? null : e.target.value)}
-          style={styles.select}
+          style={S('select', { flex: 1, minWidth: 0 })}
         >
           <option value="">All committees</option>
           <option value={GATE_KEY}>GATE ({gateRows.length})</option>
@@ -403,7 +403,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* ───────── tabs: GATE + each committee ───────── */}
-      <div style={styles.chipRow}>
+      <div style={S('chipRow', { display: 'none' })}>
         <button onClick={() => setFilter(null)} style={{ ...styles.chip, ...(filter === null ? styles.chipActive : null) }}>
           All committees ({rows.length})
         </button>
@@ -430,9 +430,9 @@ export default function AdminDashboardPage() {
           <>
             {gateLoaded && gateRows.length === 0 && <p style={styles.empty}>No gate entries yet</p>}
             {gateRows.map((r) => (
-              <div key={r.entry_code} style={styles.row}>
+              <div key={r.entry_code} style={S('row', { flexWrap: 'wrap', padding: '10px 8px', gap: 8 })}>
                 <span style={{ ...styles.rowCommittee, ...styles.rowCommitteeGate }}>GATE</span>
-                <div style={styles.rowMain}>
+                <div style={S('rowMain', { flex: '1 1 140px' })}>
                   <span style={styles.rowName}>{r.name}</span>
                   <span style={styles.rowMeta}>
                     {r.category}
@@ -455,7 +455,7 @@ export default function AdminDashboardPage() {
             {loaded && visibleRows.length === 0 && <p style={styles.empty}>No check-ins yet</p>}
             {visibleRows.map((r) =>
               editingId === r.id ? (
-                <div key={r.id} style={styles.row}>
+                <div key={r.id} style={S('row', { flexWrap: 'wrap', padding: '10px 8px', gap: 8 })}>
                   <input value={editCommittee} onChange={(e) => setEditCommittee(e.target.value)} style={styles.inputSmall} />
                   <input
                     value={editYear}
@@ -472,9 +472,9 @@ export default function AdminDashboardPage() {
                   </button>
                 </div>
               ) : (
-                <div key={r.id} style={styles.row}>
+                <div key={r.id} style={S('row', { flexWrap: 'wrap', padding: '10px 8px', gap: 8 })}>
                   <span style={styles.rowCommittee}>{r.committee}</span>
-                  <div style={styles.rowMain}>
+                  <div style={S('rowMain', { flex: '1 1 140px' })}>
                     <span style={styles.rowName}>{r.name}</span>
                     <span style={styles.rowMeta}>
                       {r.category}

@@ -1,54 +1,56 @@
-import { StrictMode, useEffect, useState } from 'react';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
 import VolunteerScanPage from './components/VolunteerScanPage';
 import LiveEntriesPage from './components/LiveEntriesPage';
 import AdminDashboardPage from './components/AdminDashboardPage';
-import { supabase } from './components/supabase';
-import { useAuth } from './hooks/useAuth';
+import { useRole } from './hooks/UseRole';
 
 const isVolunteerPage = window.location.pathname === '/scan';
 const isLivePage = window.location.pathname === '/live';
 const isAdminPage = window.location.pathname === '/admin';
 
+// Neutral screen shown while we work out who just logged in, so nobody sees
+// the public homepage flash before their dashboard.
+function Splash() {
+  return (
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#0C0C0C',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 18,
+      }}
+    >
+      <style>{`@keyframes mosaic-spin { to { transform: rotate(360deg); } }`}</style>
+      <span style={{ color: '#D7E2EA', fontFamily: 'Kanit, sans-serif', fontWeight: 900, letterSpacing: '0.2em', fontSize: 14 }}>
+        MOSAIC-2K26
+      </span>
+      <span
+        style={{
+          width: 26,
+          height: 26,
+          borderRadius: '50%',
+          border: '2px solid rgba(215,226,234,0.15)',
+          borderTopColor: '#E3A24C',
+          animation: 'mosaic-spin 0.8s linear infinite',
+        }}
+      />
+    </div>
+  );
+}
+
 function RootRoute() {
-  const { user, loading } = useAuth();
-  const [isVolunteer, setIsVolunteer] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [roleChecked, setRoleChecked] = useState(false);
+  const { info, pending } = useRole();
 
-  useEffect(() => {
-    if (loading || !user) {
-      setIsVolunteer(false);
-      setIsAdmin(false);
-      setRoleChecked(true);
-      return;
-    }
-
-    let cancelled = false;
-    supabase.functions.invoke('check-volunteer').then(({ data }) => {
-      if (cancelled) return;
-      setIsVolunteer(data?.isVolunteer === true);
-      setIsAdmin(data?.isAdmin === true);
-      setRoleChecked(true);
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [loading, user]);
-
-  // While we're still checking who this logged-in user is, hold off on
-  // rendering the public site — otherwise the admin/volunteer would see a
-  // flash of the normal homepage before being swapped to their dashboard.
-  if (user && !roleChecked) return null;
-
-  // Admin takes priority: the moment the owner's account (is_admin=true)
-  // logs in anywhere on the site, they land on the admin dashboard
-  // instead of the public homepage.
-  if (isAdmin) return <AdminDashboardPage />;
-  if (isVolunteer) return <VolunteerScanPage />;
+  if (pending) return <Splash />;
+  // Admin takes priority over volunteer.
+  if (info?.isAdmin) return <AdminDashboardPage />;
+  if (info?.isVolunteer) return <VolunteerScanPage />;
   return <App />;
 }
 
