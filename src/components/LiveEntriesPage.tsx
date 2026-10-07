@@ -3,17 +3,7 @@ import { supabase } from './supabase'; // adjust path if this file lives elsewhe
 import { useAuth } from '../hooks/useAuth';
 import { useRole } from '../hooks/UseRole';
 
-// Opens in its own tab when a committee volunteer clicks "View
-// Registrations" on their scan screen — a plain, Excel-style table of
-// everyone their committee has checked in so far, updating live as new
-// scans come in. A volunteer scans on their phone (VolunteerScanPage) and
-// this tab updates on its own, no refresh needed.
-//
-// Same login + role model as VolunteerScanPage — no separate access
-// system, no Supabase credentials ever touch the browser. A volunteer
-// only ever sees THEIR OWN committee's rows here, enforced by the same
-// RLS policy that scopes everyone else (see add-live-committee-feed.sql),
-// not by anything client-side.
+
 
 interface LiveCheckin {
   id: string;
