@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { supabase } from './supabase'; // adjust path if this file lives elsewhere
 import { useAuth } from '../hooks/useAuth'; // same hook the rest of the app uses
-import { useRole } from '../hooks/UseRole';
+import { useRole } from '../hooks/roleCheck';
 
 // This page is completely self-contained — it doesn't import or touch any
 // other component in the app (SideNav, HeroSection, RegisterSection, etc.),

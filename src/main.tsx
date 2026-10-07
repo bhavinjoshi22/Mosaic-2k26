@@ -5,7 +5,7 @@ import App from './App';
 import VolunteerScanPage from './components/VolunteerScanPage';
 import LiveEntriesPage from './components/LiveEntriesPage';
 import AdminDashboardPage from './components/AdminDashboardPage';
-import { useRole } from './hooks/UseRole';
+import { useRole } from './hooks/roleCheck';
 
 const isVolunteerPage = window.location.pathname === '/scan';
 const isLivePage = window.location.pathname === '/live';

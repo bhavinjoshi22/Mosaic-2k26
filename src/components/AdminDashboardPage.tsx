@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from './supabase'; // adjust path if this file lives elsewhere
 import { useAuth } from '../hooks/useAuth';
-import { useRole } from '../hooks/UseRole';
+import { useRole } from '../hooks/roleCheck';
 
 function useIsMobile(max = 640) {
   const [m, setM] = useState(() => typeof window !== 'undefined' && window.innerWidth < max);
