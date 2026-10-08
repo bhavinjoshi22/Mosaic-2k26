@@ -7,14 +7,14 @@ const COMMITTEES = [
   { name: 'IEEE' },
   { name: 'IETE', src: '/IETE%20TeamPhoto.jpeg' },
   { name: 'ADG', src: '/ADG%20teamPhoto.jpg' },
-  { name: 'RAW' },
+  { name: 'RAW', src: '/RAW%20TeamPhoto.jpeg' },
   { name: 'GATEE' },
   { name: 'XTEJAS' },
-  { name: 'EESA' },
+  { name: 'EESA', src: '/EESA%20TeamPhoto.jpeg' },
   { name: 'MESA', src: '/MESA%20TeamPhoto.jpeg' },
   { name: 'CODEX', src: '/CODEX%20TeamPhoto.jpeg' },
   { name: 'E-TAN', src: '/E-TAN%20TeamPhoto.jpeg' },
-  { name: 'ECSSA' },
+  { name: 'ECSSA', src: '/ECSSA%20TeamPhoto.jpeg' },
 ];
 
 const ROWS = [
@@ -23,7 +23,7 @@ const ROWS = [
   COMMITTEES.slice(10),
 ];
 
-function PhotoTile({ name, src, className = 'aspect-[4/3]' }: { name: string; src?: string; className?: string }) {
+function PhotoTile({ name, src, className = 'aspect-[3/2]' }: { name: string; src?: string; className?: string }) {
   return (
     <div className={`relative flex w-full min-w-0 items-end overflow-hidden rounded-2xl border border-dashed border-[#D7E2EA]/30 bg-[#151515] ${className}`}>
       {src ? (
@@ -70,7 +70,7 @@ export default function MarqueeSection() {
       {/* Mobile: larger 2-per-row tiles, no sliding. */}
       <div className="grid grid-cols-2 gap-4 sm:hidden">
         {COMMITTEES.map((committee) => (
-          <PhotoTile key={committee.name} {...committee} className="aspect-[4/3]" />
+          <PhotoTile key={committee.name} {...committee} className="aspect-[3/2]" />
         ))}
       </div>
 
