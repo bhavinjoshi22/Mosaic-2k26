@@ -38,9 +38,9 @@ const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
   {
     name: 'ISTE',
     posts: [
-      { photo: '/ISTE%20Mosaic%20poster.jpeg', video: '', room: '' },
-      { photo: '/ISTE%20MOSAIC1.jpeg', video: '', room: '' },
-      { photo: '/ISTE%20Mosaic.jpeg', video: '', room: '' },
+      { photo: '/ISTE%20Mosaic%20poster.jpeg', video: '', room: '414' },
+      { photo: '/ISTE%20MOSAIC1.jpeg', video: '', room: '414' },
+      { photo: '/ISTE%20Mosaic.jpeg', video: '', room: '414' },
     ],
   },
   { name: 'IEEE', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
@@ -242,7 +242,7 @@ function TerminalCard({ project }: { project: Project; index: number }) {
                 : project.name === 'IETE'
                 ? 'https://mosaic-conjuring-2026.vercel.app/'
                 : project.name === 'ECSSA'
-                  ? 'https://ecssamosaic.vercel.app/'
+                  ? 'https://ecssamosaic.pages.dev/'
                   : project.name === 'CODEX'
                     ? 'https://codexsfit.vercel.app/mosaic'
                     : 'https://csi-sfit-26-27.vercel.app/mosaic'
