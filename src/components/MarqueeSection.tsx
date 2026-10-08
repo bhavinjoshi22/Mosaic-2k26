@@ -8,7 +8,8 @@ const COMMITTEES = [
   { name: 'IETE', src: '/IETE%20TeamPhoto.jpeg' },
   { name: 'ADG', src: '/ADG%20teamPhoto.jpg' },
   { name: 'RAW' },
-  { name: 'GATEE X TEJAS' },
+  { name: 'GATEE' },
+  { name: 'XTEJAS' },
   { name: 'EESA' },
   { name: 'MESA', src: '/MESA%20TeamPhoto.jpeg' },
   { name: 'CODEX', src: '/CODEX%20TeamPhoto.jpeg' },
@@ -19,7 +20,7 @@ const COMMITTEES = [
 const ROWS = [
   COMMITTEES.slice(0, 5),
   COMMITTEES.slice(5, 10),
-  [...COMMITTEES.slice(10), ...COMMITTEES.slice(0, 2)],
+  COMMITTEES.slice(10),
 ];
 
 function PhotoTile({ name, src, className = 'aspect-[4/3]' }: { name: string; src?: string; className?: string }) {
@@ -29,7 +30,7 @@ function PhotoTile({ name, src, className = 'aspect-[4/3]' }: { name: string; sr
         <img
           src={src}
           alt={`${name} team photo`}
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-contain"
           loading="lazy"
           draggable={false}
         />
@@ -65,17 +66,12 @@ export default function MarqueeSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="w-full overflow-hidden bg-[#0C0C0C] px-3 pb-10 pt-24 sm:px-0 sm:pt-32 md:pt-40">
-      {/* Mobile: plain 2-per-row grid, no sliding. Last (odd) tile spans full width. */}
-      <div className="grid grid-cols-2 gap-3 sm:hidden">
-        {COMMITTEES.map((committee, index) => {
-          const isLastOdd = COMMITTEES.length % 2 === 1 && index === COMMITTEES.length - 1;
-          return (
-            <div key={committee.name} className={isLastOdd ? 'col-span-2' : ''}>
-              <PhotoTile {...committee} className={isLastOdd ? 'aspect-[8/3]' : 'aspect-[4/3]'} />
-            </div>
-          );
-        })}
+    <section ref={sectionRef} className="w-full overflow-hidden bg-[#0C0C0C] px-4 pb-10 pt-24 sm:px-0 sm:pt-32 md:pt-40">
+      {/* Mobile: larger 2-per-row tiles, no sliding. */}
+      <div className="grid grid-cols-2 gap-4 sm:hidden">
+        {COMMITTEES.map((committee) => (
+          <PhotoTile key={committee.name} {...committee} className="aspect-square" />
+        ))}
       </div>
 
       {/* Tablet / desktop: original sliding rows */}
