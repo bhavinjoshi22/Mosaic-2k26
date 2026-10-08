@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 const COMMITTEES = [
-  { name: 'CSI' },
+  { name: 'CSI', src: '/CSI%20TeamPhoto.jpeg' },
   { name: 'ITSA', src: '/ITSA%20TeamPhoto.jpeg' },
   { name: 'ISTE', src: '/ISTE%20TeamPhoto.jpeg' },
   { name: 'IEEE' },
