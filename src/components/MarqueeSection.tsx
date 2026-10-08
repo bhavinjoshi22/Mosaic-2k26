@@ -70,7 +70,7 @@ export default function MarqueeSection() {
       {/* Mobile: larger 2-per-row tiles, no sliding. */}
       <div className="grid grid-cols-2 gap-4 sm:hidden">
         {COMMITTEES.map((committee) => (
-          <PhotoTile key={committee.name} {...committee} className="aspect-square" />
+          <PhotoTile key={committee.name} {...committee} className="aspect-[4/3]" />
         ))}
       </div>
 
