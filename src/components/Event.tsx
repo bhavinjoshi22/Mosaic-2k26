@@ -22,12 +22,19 @@ const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
   {
     name: 'CSI',
     posts: [
-      { photo: '', video: '', room: 'Room 101' },
-      { photo: '', video: '', room: 'Room 102' },
-      { photo: '', video: '', room: 'Room 103' },
+      { photo: '', video: '', room: 'Room 318' },
+      { photo: '', video: '', room: 'Room 318' },
+      { photo: '', video: '', room: 'Room 318' },
     ],
   },
-  { name: 'ITSA', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
+  {
+    name: 'ITSA',
+    posts: [
+      { photo: '/ITSA%20GAME%20Poster%201.pdf', video: '', room: '304' },
+      { photo: '/ITSA%20GAME%20POSTER%202.pdf', video: '', room: '304' },
+      { photo: '/ITSA%20GAME%20POSTER%203.pdf', video: '', room: '304' },
+    ],
+  },
   {
     name: 'ISTE',
     posts: [
@@ -130,7 +137,11 @@ function PostMedia({ post, alt }: { post: Post; alt: string }) {
       {post.video ? (
         <video src={post.video} controls className="h-full w-full object-cover" />
       ) : post.photo ? (
-        <img src={post.photo} alt={alt} className="h-full w-full object-contain" />
+        post.photo.toLowerCase().endsWith('.pdf') ? (
+          <iframe src={post.photo} title={alt} loading="lazy" className="h-full w-full border-0 bg-white" />
+        ) : (
+          <img src={post.photo} alt={alt} className="h-full w-full object-contain" />
+        )
       ) : (
         <div className="flex h-full w-full items-center justify-center">
           <span className="px-3 text-center text-xs font-medium uppercase tracking-[0.2em] text-[#D7E2EA]/50">
@@ -224,6 +235,8 @@ function TerminalCard({ project }: { project: Project; index: number }) {
             href={
               project.name === 'ADG'
                 ? 'https://adg-game-reg.onrender.com/'
+                : project.name === 'ITSA'
+                  ? 'https://share.google/7vE0wXBpQSJlY8hux'
                 : project.name === 'E-TAN'
                   ? 'https://lightslategrey-koala-269893.hostingersite.com/'
                 : project.name === 'IETE'
