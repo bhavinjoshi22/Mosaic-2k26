@@ -5,6 +5,7 @@ import FadeIn from './FadeIn';
 import NavAuthSection from './NavAuthSection';
 import HeroBackground from './HeroBackground';
 import Magnet from './Magnet';
+import ARNavigation from './ARNavigation'; // <-- Imported ARNavigation
 
 const NAV_LINKS = [
   { label: 'About-us', href: '#about' },
@@ -31,14 +32,12 @@ function useFitFontSize(text: string) {
       const containerWidth = container.clientWidth;
       if (textWidth > 0) {
         const size = Math.floor((containerWidth / textWidth) * baseline);
-        // set directly too: React skips re-render when the value is unchanged,
-        // which would leave the imperative 200px baseline stuck on screen
         textEl.style.fontSize = `${size}px`;
         setFontSize(size);
       }
     };
     recalc();
-    document.fonts?.ready.then(recalc); // re-measure once Kanit has loaded
+    document.fonts?.ready.then(recalc);
     window.addEventListener('resize', recalc);
     return () => window.removeEventListener('resize', recalc);
   }, [text]);
@@ -53,16 +52,27 @@ interface HeroSectionProps {
 export default function HeroSection({ onRegisterClick }: HeroSectionProps) {
   const { containerRef, textRef, fontSize } = useFitFontSize(HERO_TITLE);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [arOpen, setArOpen] = useState(false); // <-- State to control AR Modal
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, label: string) => {
+    if (label.toLowerCase() === 'navigate') {
+      e.preventDefault();
+      setArOpen(true);
+      setMenuOpen(false);
+    }
+  };
 
   return (
     <section className="relative flex min-h-[100svh] flex-col" style={{ overflowX: 'clip' }}>
       <HeroBackground />
-      {/*
-        All 5 items (4 links + NavAuthSection) are direct children of this
-        `justify-between` flex row, same as before Register was replaced by
-        NavAuthSection — that's what spreads them evenly across the full
-        width instead of clustering the links together on the left.
-      */}
+
+      {/* AR NAVIGATION FULLSCREEN MODAL OVERLAY */}
+      {arOpen && (
+        <div className="fixed inset-0 z-50">
+          <ARNavigation onClose={() => setArOpen(false)} />
+        </div>
+      )}
+
       <nav className="sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-[#D7E2EA]/20 bg-[#0C0C0C]/80 px-4 py-3 backdrop-blur-md sm:px-6 md:px-10 md:py-5">
         {/* mobile: brand on the left */}
         <a href="#" className="text-sm font-black uppercase tracking-widest text-[#D7E2EA] md:hidden">
@@ -74,6 +84,7 @@ export default function HeroSection({ onRegisterClick }: HeroSectionProps) {
           <FadeIn key={link.label} delay={i * 0.05} y={-20} className="hidden md:inline-block">
             <a
               href={link.href}
+              onClick={(e) => handleNavClick(e, link.label)}
               className="text-lg font-medium uppercase tracking-wider text-[#D7E2EA] transition-opacity duration-200 hover:opacity-70 lg:text-[1.4rem]"
             >
               {link.label}
@@ -113,7 +124,12 @@ export default function HeroSection({ onRegisterClick }: HeroSectionProps) {
                   <li key={link.label} className="border-b border-[#D7E2EA]/10 last:border-b-0">
                     <a
                       href={link.href}
-                      onClick={() => setMenuOpen(false)}
+                      onClick={(e) => {
+                        handleNavClick(e, link.label);
+                        if (link.label.toLowerCase() !== 'navigate') {
+                          setMenuOpen(false);
+                        }
+                      }}
                       className="block py-3.5 text-sm font-medium uppercase tracking-widest text-[#D7E2EA]/90 transition-colors active:text-white"
                     >
                       {link.label}
