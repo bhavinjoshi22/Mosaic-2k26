@@ -1,4 +1,5 @@
 import { User } from "lucide-react";
+import { motion } from "framer-motion";
 
 const TECH_TEAM = [
   { name: "CSI", photo: "/CSI%20TECHHEAD.jpeg" },
@@ -17,27 +18,31 @@ const TECH_TEAM = [
   { name: "ECSSA" },
 ];
 
-export default function ContactSection() {
-  return (
-    <section id="contact" className="relative overflow-hidden py-20">
-      <div className="mx-auto max-w-7xl px-4">
-        <div className="pb-10 text-center">
-          <h2
-            className="hero-heading text-center font-black uppercase leading-none tracking-tight"
-            style={{ fontSize: "clamp(3rem, 12vw, 160px)" }}
-          >
-            Contact Us
-          </h2>
-          <p className="mt-3 text-sm uppercase tracking-widest text-neutral-400">
-            Meet the Tech Team
-          </p>
-        </div>
+const TEAM_ROWS = [TECH_TEAM.slice(0, 7), TECH_TEAM.slice(7)];
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {TECH_TEAM.map((committee) => (
+function CommitteeCarousel({
+  committees,
+  reverse = false,
+}: {
+  committees: typeof TECH_TEAM;
+  reverse?: boolean;
+}) {
+  return (
+    <motion.div
+      className="flex w-max"
+      animate={{ x: reverse ? ["-50%", "0%"] : ["0%", "-50%"] }}
+      transition={{ duration: 34, repeat: Infinity, ease: "linear" }}
+    >
+      {[0, 1].map((copy) => (
+        <div
+          key={copy}
+          aria-hidden={copy === 1}
+          className="flex gap-4 px-2 py-2"
+        >
+          {committees.map((committee) => (
             <article
-              key={committee.name}
-              className="overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900/50 p-3 text-center"
+              key={`${committee.name}-${copy}`}
+              className="w-[260px] max-w-[78vw] shrink-0 overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900/50 p-3 text-center"
             >
               <h3 className="mb-3 text-sm font-semibold uppercase tracking-widest text-white">
                 {committee.name}
@@ -62,6 +67,36 @@ export default function ContactSection() {
               </div>
               <p className="mt-2 text-xs text-neutral-500">Tech Head</p>
             </article>
+          ))}
+        </div>
+      ))}
+    </motion.div>
+  );
+}
+
+export default function ContactSection() {
+  return (
+    <section id="contact" className="relative overflow-hidden py-20">
+      <div className="mx-auto max-w-7xl px-4">
+        <div className="pb-10 text-center">
+          <h2
+            className="hero-heading text-center font-black uppercase leading-none tracking-tight"
+            style={{ fontSize: "clamp(3rem, 12vw, 160px)" }}
+          >
+            Contact Us
+          </h2>
+          <p className="mt-3 text-sm uppercase tracking-widest text-neutral-400">
+            Meet the Tech Team
+          </p>
+        </div>
+
+        <div className="overflow-hidden">
+          {TEAM_ROWS.map((row, index) => (
+            <CommitteeCarousel
+              key={index}
+              committees={row}
+              reverse={index === 1}
+            />
           ))}
         </div>
       </div>
