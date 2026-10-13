@@ -1,136 +1,68 @@
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { User, Mail, Phone } from "lucide-react";
+import { User } from "lucide-react";
 
-interface CouncilMember {
-  role: string;
-  name: string;
-  email: string;
-  phone: string;
-  photo?: string;
-}
-
-const COUNCIL_MEMBERS: CouncilMember[] = [
-  { role: "President", name: "Austin Machado", email: "president@mosaic2k26.com", phone: "+91 00000 00000", photo: "/Austin.jpeg" },
-  { role: "General Secretary", name: "Royce Rodriguez", email: "gensec@mosaic2k26.com", phone: "+91 00000 00000", photo: "/Royce.jpeg" },
-  { role: "Lady Representative", name: "Bhavisha", email: "ladyrep@mosaic2k26.com", phone: "+91 00000 00000", photo: "/Bhavisha.jpeg" },
-  { role: "Technical Secretary", name: "Aman Gound", email: "techsec@mosaic2k26.com", phone: "+91 00000 00000", photo: "/aman.jpeg" },
-  { role: "Joint Technical Secretary", name: "Bhavin Joshi", email: "jtechsec@mosaic2k26.com", phone: "+91 00000 00000", photo: "/Bhavin.jpeg" },
-  { role: "NSS Representative", name: "Shravan More", email: "nssrep@mosaic2k26.com", phone: "+91 00000 00000", photo: "/image.jpeg" },
-  { role: "Cultural Secretary", name: "Rashi", email: "culsec@mosaic2k26.com", phone: "+91 00000 00000", photo: "/Rashi.jpeg" },
-  { role: "Joint Cultural Secretary", name: "Janhvi", email: "jculsec@mosaic2k26.com", phone: "+91 00000 00000", photo: "/Janhvi.jpeg" },
-  { role: "Sports Secretary", name: "Sarang", email: "sportsec@mosaic2k26.com", phone: "+91 00000 00000", photo: "/Sarang.jpeg" },
-  { role: "Joint Sports Secretary", name: "Divesh", email: "jsportsec@mosaic2k26.com", phone: "+91 00000 00000", photo: "/Divesh.jpeg" },
+const TECH_TEAM = [
+  { name: "CSI", photo: "/CSI%20TECHHEAD.jpeg" },
+  { name: "ITSA" },
+  { name: "ISTE", photo: "/ISTE%20TECHHEAD" },
+  { name: "IEEE" },
+  { name: "IETE", photo: "/IETE%20TECHHEAD.jpeg" },
+  { name: "ADG" },
+  { name: "RAW", photo: "/RAW%20TECHHEAD" },
+  { name: "GATEE" },
+  { name: "TEJAS" },
+  { name: "EESA" },
+  { name: "MESA" },
+  { name: "CODEX", photo: "/CODEX%20TECHHEAD.jpeg" },
+  { name: "E-TAN" },
+  { name: "ECSSA" },
 ];
 
-
-const STACK_GAP = 300;
-
-const AUTOPLAY_INTERVAL = 2500;
-
 export default function ContactSection() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 640);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, []);
-
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setActiveIndex((current) => (current + 1) % COUNCIL_MEMBERS.length);
-    }, AUTOPLAY_INTERVAL);
-    return () => clearInterval(id);
-  }, []);
-
   return (
     <section id="contact" className="relative overflow-hidden py-20">
-
-      <div className="relative flex flex-col">
-        <div className="pb-4 text-center">
+      <div className="mx-auto max-w-7xl px-4">
+        <div className="pb-10 text-center">
           <h2
             className="hero-heading text-center font-black uppercase leading-none tracking-tight"
-            style={{ fontSize: 'clamp(3rem, 12vw, 160px)' }}
+            style={{ fontSize: "clamp(3rem, 12vw, 160px)" }}
           >
             Contact Us
           </h2>
-          <p className="mt-2 text-sm text-neutral-500">Meet the council</p>
+          <p className="mt-3 text-sm uppercase tracking-widest text-neutral-400">
+            Meet the Tech Team
+          </p>
         </div>
 
-        {/* Horizontal cover-flow stack, auto-playing */}
-        <div className="relative h-[600px] overflow-hidden sm:h-[720px]">
-          {COUNCIL_MEMBERS.map((member, i) => {
-            const total = COUNCIL_MEMBERS.length;
-
-            let offset = i - activeIndex;
-            if (offset > total / 2) offset -= total;
-            if (offset < -total / 2) offset += total;
-            const abs = Math.abs(offset);
-            const isActive = offset === 0;
-            const visible = abs <= (isMobile ? 0 : 2);
-
-            return (
-              <motion.div
-                key={i}
-                className="absolute left-1/2 top-1/2 w-[min(340px,88vw)] sm:w-[420px]"
-                style={{ zIndex: 10 - abs }}
-                animate={{
-                  x: `calc(-50% + ${offset * (isMobile ? 0 : STACK_GAP)}px)`,
-                  y: "-50%",
-                  scale: isActive ? 1 : 0.8,
-                  opacity: visible ? (isActive ? 1 : 0.35) : 0,
-                }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <div
-                  className={`rounded-2xl border p-6 text-center backdrop-blur-sm transition-colors ${
-                    isActive
-                      ? "border-neutral-700 bg-neutral-900/70"
-                      : "border-neutral-800 bg-neutral-900/40"
-                  }`}
-                >
-                  <p className="mb-4 text-xs uppercase tracking-wide text-neutral-500">
-                    {member.role}
-                  </p>
-
-                  {/* Photo box — shows member.photo, falls back to the User icon if it fails to load */}
-                  <div className="relative mx-auto mb-7 h-56 w-56 sm:h-64 sm:w-64">
-                    <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-xl border border-neutral-700 bg-neutral-800/50">
-                      {member.photo && (
-                        <img
-                          src={member.photo}
-                          alt={member.name}
-                          className="h-full w-full object-cover"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                            e.currentTarget.nextElementSibling?.classList.remove("hidden");
-                          }}
-                        />
-                      )}
-                      <User className="hidden h-14 w-14 text-neutral-600" />
-                    </div>
-                  </div>
-
-                  <h3 className="text-xl font-medium text-white">{member.name}</h3>
-
-                  <div className="mt-3 space-y-1.5 text-sm text-neutral-400">
-                    <div className="flex items-center justify-center gap-2">
-                      <Mail className="h-4 w-4" />
-                      <span>{member.email}</span>
-                    </div>
-                    <div className="flex items-center justify-center gap-2">
-                      <Phone className="h-4 w-4" />
-                      <span>{member.phone}</span>
-                    </div>
-                  </div>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {TECH_TEAM.map((committee) => (
+            <article
+              key={committee.name}
+              className="overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900/50 p-3 text-center"
+            >
+              <h3 className="mb-3 text-sm font-semibold uppercase tracking-widest text-white">
+                {committee.name}
+              </h3>
+              <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-lg border border-neutral-800 bg-neutral-800/50">
+                {committee.photo ? (
+                  <img
+                    src={committee.photo}
+                    alt={`${committee.name} Tech Head`}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                    onError={(event) => {
+                      event.currentTarget.style.display = "none";
+                      event.currentTarget.nextElementSibling?.classList.remove("hidden");
+                    }}
+                  />
+                ) : null}
+                <div className={`${committee.photo ? "hidden" : ""} flex flex-col items-center gap-2 text-neutral-500`}>
+                  <User className="h-8 w-8" />
+                  <span className="text-[10px] uppercase tracking-wider">Photo coming soon</span>
                 </div>
-              </motion.div>
-            );
-          })}
+              </div>
+              <p className="mt-2 text-xs text-neutral-500">Tech Head</p>
+            </article>
+          ))}
         </div>
       </div>
     </section>
