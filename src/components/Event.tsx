@@ -59,7 +59,14 @@ const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
   { name: 'TEJAS', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
   { name: 'EESA', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
   { name: 'MESA', posts: [{ photo: '/MESSA%20EVENT%20POSTER.jpeg', video: '', room: '' }] },
-  { name: 'CODEX', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
+  {
+    name: 'CODEX',
+    posts: [
+      { photo: '/CODEX%20EVENT%20POSTER.png', video: '', room: '' },
+      { photo: '/CODEX%20EVENT%20POSTER%201.jpeg', video: '', room: '' },
+      { photo: '/CODEX%20EVENT%20POSTER%202.jpeg', video: '', room: '' },
+    ],
+  },
   {
     name: 'E-TAN',
     posts: [
