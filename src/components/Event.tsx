@@ -16,40 +16,23 @@ interface Project {
   posts: Post[];
 }
 
-// Fill in each committee's actual events: upload photo/video and set
-// the room number for each. Every committee should have 3 entries.
+// Add only the event posters that exist for each committee.
 const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
   {
     name: 'CSI',
-    posts: [
-      { photo: '/CSI%20GAME%20POSTER.png', video: '', room: 'Room 318' },
-      { photo: '', video: '', room: 'Room 318' },
-      { photo: '', video: '', room: 'Room 318' },
-    ],
+    posts: [{ photo: '/CSI%20GAME%20POSTER.png', video: '', room: 'Room 318' }],
   },
   {
     name: 'ITSA',
-    posts: [
-      { photo: '/ITSA%20GAME%20Poster%201.pdf', video: '', room: '304' },
-      { photo: '/ITSA%20GAME%20POSTER%202.pdf', video: '', room: '304' },
-      { photo: '/ITSA%20GAME%20POSTER%203.pdf', video: '', room: '304' },
-    ],
+    posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '304' })),
   },
   {
     name: 'ISTE',
-    posts: [
-      { photo: '/ISTE%20Mosaic%20poster.jpeg', video: '', room: '414' },
-      { photo: '/ISTE%20MOSAIC1.jpeg', video: '', room: '414' },
-      { photo: '/ISTE%20Mosaic.jpeg', video: '', room: '414' },
-    ],
+    posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '414' })),
   },
   {
     name: 'IEEE',
-    posts: [
-      { photo: '/IEEE%20EVENT%20POSTER.jpeg', video: '', room: '' },
-      { photo: '', video: '', room: '' },
-      { photo: '', video: '', room: '' },
-    ],
+    posts: [{ photo: '/IEEE%20EVENT%20POSTER.jpeg', video: '', room: '' }],
   },
   {
     name: 'IETE',
@@ -62,22 +45,22 @@ const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
   {
     name: 'ADG',
     posts: [
-      { photo: '/ADG%20Ethical%20Hacking%20workshop.jpg', video: '', room: '' },
-      { photo: '/ADG%20Mosaic%20PR%20message%20Poster.jpg', video: '', room: '' },
-      { photo: '/ADG%20Printed%20PR%20Poster%20.png', video: '', room: '' },
+      { photo: '/ADG%20EVENT%20POSTER.jpeg', video: '', room: '' },
+      { photo: '/ADG%20EVENT%20POSTER%201.jpeg', video: '', room: '' },
+      { photo: '/ADG%20EVENT%20POSTER%202.jpeg', video: '', room: '' },
     ],
   },
-  { name: 'RAW', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
+  { name: 'RAW', posts: [{ photo: '/RAW%20EVENT%20POSTER.png', video: '', room: '' }] },
   { name: 'GATEE', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
   { name: 'TEJAS', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
-  { name: 'MESA', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
+  { name: 'EESA', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
+  { name: 'MESA', posts: [{ photo: '/MESSA%20EVENT%20POSTER.jpeg', video: '', room: '' }] },
   { name: 'CODEX', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
   {
     name: 'E-TAN',
     posts: [
-      { photo: '/E-TAN%20POSTER.jpeg', video: '', room: '' },
-      { photo: '/E-TAN%20POSTER1.jpeg', video: '', room: '' },
-      { photo: '/E-TAN%20POSTER2.jpeg', video: '', room: '' },
+      { photo: '/E-TAN%20EVENT%20POSTER.jpeg', video: '', room: '' },
+      { photo: '/E-TAN%20EVENT%20POSTER%201.jpeg', video: '', room: '' },
     ],
   },
   { name: 'ECSSA', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
@@ -93,9 +76,12 @@ const COMMITTEES: Project[] = COMMITTEE_DATA.map((committee, index) => ({
 const WEBSITE_LINKS: Record<string, string> = {
   CSI: 'https://csi-sfit-26-27.vercel.app/mosaic',
   ITSA: 'https://share.google/7vE0wXBpQSJlY8hux',
+  ISTE: 'https://istesfit.vercel.app/mosaic',
+  IEEE: 'https://issb.sfit.ac.in/ctrl-freak',
   ADG: 'https://adg-game-reg.onrender.com/',
   'E-TAN': 'https://lightslategrey-koala-269893.hostingersite.com/',
   IETE: 'https://mosaic-conjuring-2026.vercel.app/',
+  RAW: 'https://rawwebsite-seven.vercel.app/mosaic-26',
   ECSSA: 'https://ecssamosaic.pages.dev/',
   CODEX: 'https://codexsfit.vercel.app/mosaic',
 };
@@ -264,11 +250,13 @@ function TerminalCard({ project }: { project: Project; index: number }) {
           )}
         </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className={project.posts.length === 1
+          ? 'mx-auto grid w-full max-w-4xl grid-cols-1 gap-3'
+          : 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3'}>
           {project.posts.map((post, postIndex) => (
             <div
               key={`${project.number}-${postIndex}`}
-              className="relative h-[240px] sm:h-[clamp(180px,22vw,340px)] overflow-hidden rounded-2xl border border-white/10 bg-[#111]"
+              className={`relative ${project.posts.length === 1 ? 'h-[min(72vh,680px)] min-h-[420px]' : 'h-[240px] sm:h-[clamp(180px,22vw,340px)]'} overflow-hidden rounded-2xl border border-white/10 bg-[#111]`}
             >
               <PostMedia post={post} alt={`${project.name} post ${postIndex + 1}`} />
             </div>
