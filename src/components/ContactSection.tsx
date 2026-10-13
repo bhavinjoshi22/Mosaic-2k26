@@ -18,19 +18,11 @@ const TECH_TEAM = [
   { name: "ECSSA" },
 ];
 
-const TEAM_ROWS = [TECH_TEAM.slice(0, 7), TECH_TEAM.slice(7)];
-
-function CommitteeCarousel({
-  committees,
-  reverse = false,
-}: {
-  committees: typeof TECH_TEAM;
-  reverse?: boolean;
-}) {
+function CommitteeCarousel() {
   return (
     <motion.div
       className="flex w-max"
-      animate={{ x: reverse ? ["-50%", "0%"] : ["0%", "-50%"] }}
+      animate={{ x: ["0%", "-50%"] }}
       transition={{ duration: 34, repeat: Infinity, ease: "linear" }}
     >
       {[0, 1].map((copy) => (
@@ -39,7 +31,7 @@ function CommitteeCarousel({
           aria-hidden={copy === 1}
           className="flex gap-4 px-2 py-2"
         >
-          {committees.map((committee) => (
+          {TECH_TEAM.map((committee) => (
             <article
               key={`${committee.name}-${copy}`}
               className="w-[260px] max-w-[78vw] shrink-0 overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900/50 p-3 text-center"
@@ -91,13 +83,7 @@ export default function ContactSection() {
         </div>
 
         <div className="overflow-hidden">
-          {TEAM_ROWS.map((row, index) => (
-            <CommitteeCarousel
-              key={index}
-              committees={row}
-              reverse={index === 1}
-            />
-          ))}
+          <CommitteeCarousel />
         </div>
       </div>
     </section>
