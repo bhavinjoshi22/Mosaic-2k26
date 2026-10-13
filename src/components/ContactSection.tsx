@@ -4,7 +4,7 @@ import { User } from "lucide-react";
 
 type TechTeamMember = {
   name: string;
-  photo?: string;
+  photo: string;
   headName?: string;
   mobile?: string;
   email?: string;
@@ -14,12 +14,12 @@ const TECH_TEAM: TechTeamMember[] = [
   { name: "CSI", photo: "/CSI%20TECHHEAD.jpeg" },
   {
     name: "ITSA",
+    photo: "/ITSA%20TECHHEAD.jpeg",
     headName: "Bhavin Joshi",
     mobile: "8591601713",
     email: "bhavinjoshi22032006@student.sfit.ac.in",
   },
   { name: "ISTE", photo: "/ISTE%20TECHHEAD" },
-  { name: "IEEE" },
   {
     name: "IETE",
     photo: "/IETE%20TECHHEAD.jpeg",
@@ -35,13 +35,9 @@ const TECH_TEAM: TechTeamMember[] = [
     mobile: "8976357005",
     email: "joshuacoutinho5@student.sfit.ac.in",
   },
-  { name: "GATEE" },
-  { name: "TEJAS" },
-  { name: "EESA" },
-  { name: "MESA" },
+  { name: "EESA", photo: "/EESA%20TECHHEAD.jpeg" },
   { name: "CODEX", photo: "/CODEX%20TECHHEAD.jpeg" },
-  { name: "E-TAN" },
-  { name: "ECSSA" },
+  { name: "ECSSA", photo: "/ECSSA%20TECHHEAD.jpeg" },
 ];
 
 function CommitteeCarousel() {
@@ -72,27 +68,31 @@ function CommitteeCarousel() {
             {committee.name}
           </h3>
           <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-lg border border-neutral-800 bg-neutral-800/50">
-            {committee.photo ? (
-              <img
-                src={committee.photo}
-                alt={`${committee.name} Tech Head`}
-                className="h-full w-full object-cover"
-                loading="lazy"
-                onError={(event) => {
-                  event.currentTarget.style.display = "none";
-                  event.currentTarget.nextElementSibling?.classList.remove("hidden");
-                }}
-              />
-            ) : null}
-            <div className={`${committee.photo ? "hidden" : ""} flex flex-col items-center gap-2 text-neutral-500`}>
+            <img
+              src={committee.photo}
+              alt={`${committee.name} Tech Head`}
+              className="h-full w-full object-cover"
+              loading="lazy"
+              onError={(event) => {
+                event.currentTarget.style.display = "none";
+                event.currentTarget.nextElementSibling?.classList.remove("hidden");
+              }}
+            />
+            <div className="hidden flex-col items-center gap-2 text-neutral-500">
               <User className="h-8 w-8" />
-              <span className="text-[10px] uppercase tracking-wider">Photo coming soon</span>
+              <span className="text-[10px] uppercase tracking-wider">Photo unavailable</span>
             </div>
           </div>
           <div className="mt-4 space-y-2 text-left text-sm">
-            <p className="text-white">{committee.headName || "Name not provided"}</p>
-            <p className="text-neutral-400">Mobile: {committee.mobile || "Not provided"}</p>
-            <p className="break-all text-neutral-400">Email: {committee.email || "Not provided"}</p>
+            {committee.headName || committee.mobile || committee.email ? (
+              <>
+                {committee.headName && <p className="text-white">{committee.headName}</p>}
+                {committee.mobile && <p className="text-neutral-400">Mobile: {committee.mobile}</p>}
+                {committee.email && <p className="break-all text-neutral-400">Email: {committee.email}</p>}
+              </>
+            ) : (
+              <p className="text-neutral-500">Tech Head details coming soon</p>
+            )}
           </div>
         </motion.article>
       </AnimatePresence>
