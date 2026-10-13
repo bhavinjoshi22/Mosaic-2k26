@@ -1,136 +1,128 @@
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { User, Mail, Phone } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
-interface CouncilMember {
-  role: string;
+type TechTeamMember = {
   name: string;
-  email: string;
-  phone: string;
-  photo?: string;
-}
+  photo: string;
+  headName?: string;
+  mobile?: string;
+  email?: string;
+};
 
-const COUNCIL_MEMBERS: CouncilMember[] = [
-  { role: "President", name: "Austin Machado", email: "president@mosaic2k26.com", phone: "+91 00000 00000", photo: "/Austin.jpeg" },
-  { role: "General Secretary", name: "Royce Rodriguez", email: "gensec@mosaic2k26.com", phone: "+91 00000 00000", photo: "/Royce.jpeg" },
-  { role: "Lady Representative", name: "Bhavisha", email: "ladyrep@mosaic2k26.com", phone: "+91 00000 00000", photo: "/Bhavisha.jpeg" },
-  { role: "Technical Secretary", name: "Aman Gound", email: "techsec@mosaic2k26.com", phone: "+91 00000 00000", photo: "/aman.jpeg" },
-  { role: "Joint Technical Secretary", name: "Bhavin Joshi", email: "jtechsec@mosaic2k26.com", phone: "+91 00000 00000", photo: "/Bhavin.jpeg" },
-  { role: "NSS Representative", name: "Shravan More", email: "nssrep@mosaic2k26.com", phone: "+91 00000 00000", photo: "/image.jpeg" },
-  { role: "Cultural Secretary", name: "Rashi", email: "culsec@mosaic2k26.com", phone: "+91 00000 00000", photo: "/Rashi.jpeg" },
-  { role: "Joint Cultural Secretary", name: "Janhvi", email: "jculsec@mosaic2k26.com", phone: "+91 00000 00000", photo: "/Janhvi.jpeg" },
-  { role: "Sports Secretary", name: "Sarang", email: "sportsec@mosaic2k26.com", phone: "+91 00000 00000", photo: "/Sarang.jpeg" },
-  { role: "Joint Sports Secretary", name: "Divesh", email: "jsportsec@mosaic2k26.com", phone: "+91 00000 00000", photo: "/Divesh.jpeg" },
+const TECH_TEAM: TechTeamMember[] = [
+  { name: "CSI", photo: "/CSI%20TECHHEAD.jpeg" },
+  {
+    name: "ITSA",
+    photo: "/ITSA%20TECHHEAD.jpeg",
+    headName: "Bhavin Joshi",
+    mobile: "8591601713",
+    email: "bhavinjoshi22032006@student.sfit.ac.in",
+  },
+  { name: "ISTE", photo: "/ISTE%20TECHHEAD" },
+  {
+    name: "IETE",
+    photo: "/IETE%20TECHHEAD.jpeg",
+    headName: "Soham Kadam",
+    mobile: "9870526618",
+    email: "sohamkadam440@student.sfit.ac.in",
+  },
+  {
+    name: "RAW",
+    photo: "/RAW%20TECHHEAD",
+    headName: "Joshua Coutinho",
+    mobile: "8976357005",
+    email: "joshuacoutinho5@student.sfit.ac.in",
+  },
+  { name: "EESA", photo: "/EESA%20TECHHEAD.jpeg" },
+  { name: "CODEX", photo: "/CODEX%20TECHHEAD.jpeg" },
+  { name: "ECSSA", photo: "/ECSSA%20TECHHEAD.jpeg" },
 ];
 
-
-const STACK_GAP = 300;
-
-const AUTOPLAY_INTERVAL = 2500;
-
-export default function ContactSection() {
+function CommitteeCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
+  const [unavailablePhotos, setUnavailablePhotos] = useState<string[]>([]);
+  const visibleTeam = TECH_TEAM.filter((member) => !unavailablePhotos.includes(member.name));
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 640);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, []);
+    if (visibleTeam.length < 2) return;
 
+    const timer = window.setInterval(() => {
+      setActiveIndex((index) => (index + 1) % visibleTeam.length);
+    }, 3000);
+
+    return () => window.clearInterval(timer);
+  }, [visibleTeam.length]);
 
   useEffect(() => {
-    const id = setInterval(() => {
-      setActiveIndex((current) => (current + 1) % COUNCIL_MEMBERS.length);
-    }, AUTOPLAY_INTERVAL);
-    return () => clearInterval(id);
-  }, []);
+    if (activeIndex >= visibleTeam.length) setActiveIndex(0);
+  }, [activeIndex, visibleTeam.length]);
+
+  const committee = visibleTeam[activeIndex];
+
+  if (!committee) return null;
 
   return (
-    <section id="contact" className="relative overflow-hidden py-20">
+    <div className="relative mx-auto min-h-[500px] w-[min(88vw,360px)] overflow-hidden sm:min-h-[520px]">
+      <AnimatePresence initial={false}>
+        <motion.article
+          key={committee.name}
+          initial={{ x: "12%", opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: "-12%", opacity: 0 }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute inset-0 overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900/50 p-3 text-center"
+        >
+          <h3 className="mb-3 text-sm font-semibold uppercase tracking-widest text-white">
+            {committee.name}
+          </h3>
+          <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-lg border border-neutral-800 bg-neutral-800/50">
+            <img
+              src={committee.photo}
+              alt={`${committee.name} Tech Head`}
+              className="h-full w-full object-cover"
+              loading="lazy"
+              onError={(event) => {
+                setUnavailablePhotos((current) =>
+                  current.includes(committee.name) ? current : [...current, committee.name],
+                );
+              }}
+            />
+          </div>
+          <div className="mt-4 space-y-2 text-left text-sm">
+            {committee.headName || committee.mobile || committee.email ? (
+              <>
+                {committee.headName && <p className="text-white">{committee.headName}</p>}
+                {committee.mobile && <p className="text-neutral-400">Mobile: {committee.mobile}</p>}
+                {committee.email && <p className="break-all text-neutral-400">Email: {committee.email}</p>}
+              </>
+            ) : (
+              <p className="text-neutral-500">Tech Head details coming soon</p>
+            )}
+          </div>
+        </motion.article>
+      </AnimatePresence>
+    </div>
+  );
+}
 
-      <div className="relative flex flex-col">
-        <div className="pb-4 text-center">
+export default function ContactSection() {
+  return (
+    <section id="contact" className="relative overflow-hidden py-20">
+      <div className="mx-auto max-w-7xl px-4">
+        <div className="pb-10 text-center">
           <h2
             className="hero-heading text-center font-black uppercase leading-none tracking-tight"
-            style={{ fontSize: 'clamp(3rem, 12vw, 160px)' }}
+            style={{ fontSize: "clamp(3rem, 12vw, 160px)" }}
           >
             Contact Us
           </h2>
-          <p className="mt-2 text-sm text-neutral-500">Meet the council</p>
+          <p className="mt-3 text-sm uppercase tracking-widest text-neutral-400">
+            Meet the Tech Team
+          </p>
         </div>
 
-        {/* Horizontal cover-flow stack, auto-playing */}
-        <div className="relative h-[600px] overflow-hidden sm:h-[720px]">
-          {COUNCIL_MEMBERS.map((member, i) => {
-            const total = COUNCIL_MEMBERS.length;
-
-            let offset = i - activeIndex;
-            if (offset > total / 2) offset -= total;
-            if (offset < -total / 2) offset += total;
-            const abs = Math.abs(offset);
-            const isActive = offset === 0;
-            const visible = abs <= (isMobile ? 0 : 2);
-
-            return (
-              <motion.div
-                key={i}
-                className="absolute left-1/2 top-1/2 w-[min(340px,88vw)] sm:w-[420px]"
-                style={{ zIndex: 10 - abs }}
-                animate={{
-                  x: `calc(-50% + ${offset * (isMobile ? 0 : STACK_GAP)}px)`,
-                  y: "-50%",
-                  scale: isActive ? 1 : 0.8,
-                  opacity: visible ? (isActive ? 1 : 0.35) : 0,
-                }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <div
-                  className={`rounded-2xl border p-6 text-center backdrop-blur-sm transition-colors ${
-                    isActive
-                      ? "border-neutral-700 bg-neutral-900/70"
-                      : "border-neutral-800 bg-neutral-900/40"
-                  }`}
-                >
-                  <p className="mb-4 text-xs uppercase tracking-wide text-neutral-500">
-                    {member.role}
-                  </p>
-
-                  {/* Photo box — shows member.photo, falls back to the User icon if it fails to load */}
-                  <div className="relative mx-auto mb-7 h-56 w-56 sm:h-64 sm:w-64">
-                    <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-xl border border-neutral-700 bg-neutral-800/50">
-                      {member.photo && (
-                        <img
-                          src={member.photo}
-                          alt={member.name}
-                          className="h-full w-full object-cover"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                            e.currentTarget.nextElementSibling?.classList.remove("hidden");
-                          }}
-                        />
-                      )}
-                      <User className="hidden h-14 w-14 text-neutral-600" />
-                    </div>
-                  </div>
-
-                  <h3 className="text-xl font-medium text-white">{member.name}</h3>
-
-                  <div className="mt-3 space-y-1.5 text-sm text-neutral-400">
-                    <div className="flex items-center justify-center gap-2">
-                      <Mail className="h-4 w-4" />
-                      <span>{member.email}</span>
-                    </div>
-                    <div className="flex items-center justify-center gap-2">
-                      <Phone className="h-4 w-4" />
-                      <span>{member.phone}</span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
+        <div className="overflow-hidden">
+          <CommitteeCarousel />
         </div>
       </div>
     </section>
