@@ -50,7 +50,7 @@ function CommitteeCarousel() {
   useEffect(() => {
     const timer = window.setInterval(() => {
       setActiveIndex((index) => (index + 1) % TECH_TEAM.length);
-    }, 1500);
+    }, 3000);
 
     return () => window.clearInterval(timer);
   }, []);
@@ -62,10 +62,10 @@ function CommitteeCarousel() {
       <AnimatePresence initial={false}>
         <motion.article
           key={committee.name}
-          initial={{ x: "100%" }}
-          animate={{ x: 0 }}
-          exit={{ x: "-100%" }}
-          transition={{ duration: 0.55, ease: "easeInOut" }}
+          initial={{ x: "12%", opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: "-12%", opacity: 0 }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           className="absolute inset-0 overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900/50 p-3 text-center"
         >
           <h3 className="mb-3 text-sm font-semibold uppercase tracking-widest text-white">

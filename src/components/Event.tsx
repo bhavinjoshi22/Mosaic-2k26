@@ -22,7 +22,7 @@ const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
   {
     name: 'CSI',
     posts: [
-      { photo: '', video: '', room: 'Room 318' },
+      { photo: '/CSI%20GAME%20POSTER.png', video: '', room: 'Room 318' },
       { photo: '', video: '', room: 'Room 318' },
       { photo: '', video: '', room: 'Room 318' },
     ],
@@ -43,8 +43,22 @@ const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
       { photo: '/ISTE%20Mosaic.jpeg', video: '', room: '414' },
     ],
   },
-  { name: 'IEEE', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
-  { name: 'IETE', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
+  {
+    name: 'IEEE',
+    posts: [
+      { photo: '/IEEE%20EVENT%20POSTER.jpeg', video: '', room: '' },
+      { photo: '', video: '', room: '' },
+      { photo: '', video: '', room: '' },
+    ],
+  },
+  {
+    name: 'IETE',
+    posts: [
+      { photo: '/IETE%20EVENT%20POSTER%201.png', video: '', room: '' },
+      { photo: '/IETE%20EVENT%20POSTER%202.png', video: '', room: '' },
+      { photo: '/IETE%20EVENT%20POSTER%203.png', video: '', room: '' },
+    ],
+  },
   {
     name: 'ADG',
     posts: [
@@ -56,7 +70,7 @@ const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
   { name: 'RAW', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
   { name: 'GATEE', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
   { name: 'TEJAS', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
-  { name: 'MESSA', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
+  { name: 'MESA', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
   { name: 'CODEX', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
   {
     name: 'E-TAN',
@@ -75,6 +89,16 @@ const COMMITTEES: Project[] = COMMITTEE_DATA.map((committee, index) => ({
   name: committee.name,
   posts: committee.posts,
 }));
+
+const WEBSITE_LINKS: Record<string, string> = {
+  CSI: 'https://csi-sfit-26-27.vercel.app/mosaic',
+  ITSA: 'https://share.google/7vE0wXBpQSJlY8hux',
+  ADG: 'https://adg-game-reg.onrender.com/',
+  'E-TAN': 'https://lightslategrey-koala-269893.hostingersite.com/',
+  IETE: 'https://mosaic-conjuring-2026.vercel.app/',
+  ECSSA: 'https://ecssamosaic.pages.dev/',
+  CODEX: 'https://codexsfit.vercel.app/mosaic',
+};
 
 const TOTAL_CARDS = COMMITTEES.length;
 
@@ -231,23 +255,13 @@ function TerminalCard({ project }: { project: Project; index: number }) {
               <DecryptText text={project.name} active={inView} />
             </h3>
           </div>
-          <LiveProjectButton
-            href={
-              project.name === 'ADG'
-                ? 'https://adg-game-reg.onrender.com/'
-                : project.name === 'ITSA'
-                  ? 'https://share.google/7vE0wXBpQSJlY8hux'
-                : project.name === 'E-TAN'
-                  ? 'https://lightslategrey-koala-269893.hostingersite.com/'
-                : project.name === 'IETE'
-                ? 'https://mosaic-conjuring-2026.vercel.app/'
-                : project.name === 'ECSSA'
-                  ? 'https://ecssamosaic.pages.dev/'
-                  : project.name === 'CODEX'
-                    ? 'https://codexsfit.vercel.app/mosaic'
-                    : 'https://csi-sfit-26-27.vercel.app/mosaic'
-            }
-          />
+          {WEBSITE_LINKS[project.name] ? (
+            <LiveProjectButton href={WEBSITE_LINKS[project.name]} />
+          ) : (
+            <span className="font-mono text-[10px] uppercase tracking-wider text-[#D7E2EA]/35">
+              Website link not provided
+            </span>
+          )}
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
