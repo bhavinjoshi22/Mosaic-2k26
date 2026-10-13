@@ -24,7 +24,11 @@ const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
   },
   {
     name: 'ITSA',
-    posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '304' })),
+    posts: [
+      { photo: '/ITSA%20EVENT%20POSTER.jpeg', video: '', room: '304' },
+      { photo: '/ITSA%20EVENT%20POSTER%201.jpeg', video: '', room: '304' },
+      { photo: '/ITSA%20EVENT%20POSTER%202.jpeg', video: '', room: '304' },
+    ],
   },
   {
     name: 'ISTE',
@@ -61,6 +65,7 @@ const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
     posts: [
       { photo: '/E-TAN%20EVENT%20POSTER.jpeg', video: '', room: '' },
       { photo: '/E-TAN%20EVENT%20POSTER%201.jpeg', video: '', room: '' },
+      { photo: '/E-TAN%20EVENT%20POSTER%202.jpeg', video: '', room: '' },
     ],
   },
   { name: 'ECSSA', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
