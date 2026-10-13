@@ -98,6 +98,7 @@ const WEBSITE_LINKS: Record<string, string> = {
   ISTE: 'https://istesfit.vercel.app/mosaic',
   IEEE: 'https://issb.sfit.ac.in/ctrl-freak',
   ADG: 'https://adg-game-reg.onrender.com/',
+  EESA: 'https://eesaxsfit.netlify.app/',
   'E-TAN': 'https://lightslategrey-koala-269893.hostingersite.com/',
   IETE: 'https://mosaic-conjuring-2026.vercel.app/',
   RAW: 'https://rawwebsite-seven.vercel.app/mosaic-26',

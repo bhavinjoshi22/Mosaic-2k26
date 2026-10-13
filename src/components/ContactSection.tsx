@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { User } from "lucide-react";
 
 type TechTeamMember = {
   name: string;
@@ -27,7 +26,6 @@ const TECH_TEAM: TechTeamMember[] = [
     mobile: "9870526618",
     email: "sohamkadam440@student.sfit.ac.in",
   },
-  { name: "ADG" },
   {
     name: "RAW",
     photo: "/RAW%20TECHHEAD",
@@ -42,16 +40,26 @@ const TECH_TEAM: TechTeamMember[] = [
 
 function CommitteeCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [unavailablePhotos, setUnavailablePhotos] = useState<string[]>([]);
+  const visibleTeam = TECH_TEAM.filter((member) => !unavailablePhotos.includes(member.name));
 
   useEffect(() => {
+    if (visibleTeam.length < 2) return;
+
     const timer = window.setInterval(() => {
-      setActiveIndex((index) => (index + 1) % TECH_TEAM.length);
+      setActiveIndex((index) => (index + 1) % visibleTeam.length);
     }, 3000);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [visibleTeam.length]);
 
-  const committee = TECH_TEAM[activeIndex];
+  useEffect(() => {
+    if (activeIndex >= visibleTeam.length) setActiveIndex(0);
+  }, [activeIndex, visibleTeam.length]);
+
+  const committee = visibleTeam[activeIndex];
+
+  if (!committee) return null;
 
   return (
     <div className="relative mx-auto min-h-[500px] w-[min(88vw,360px)] overflow-hidden sm:min-h-[520px]">
@@ -74,14 +82,11 @@ function CommitteeCarousel() {
               className="h-full w-full object-cover"
               loading="lazy"
               onError={(event) => {
-                event.currentTarget.style.display = "none";
-                event.currentTarget.nextElementSibling?.classList.remove("hidden");
+                setUnavailablePhotos((current) =>
+                  current.includes(committee.name) ? current : [...current, committee.name],
+                );
               }}
             />
-            <div className="hidden flex-col items-center gap-2 text-neutral-500">
-              <User className="h-8 w-8" />
-              <span className="text-[10px] uppercase tracking-wider">Photo unavailable</span>
-            </div>
           </div>
           <div className="mt-4 space-y-2 text-left text-sm">
             {committee.headName || committee.mobile || committee.email ? (
