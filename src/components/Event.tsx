@@ -139,11 +139,8 @@ function DecryptText({ text, active, className, style }: { text: string; active:
 // --------------------------------------------------------------------------
 
 function PostMedia({ post, alt }: { post: Post; alt: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.4 });
-
   return (
-    <div ref={ref} className="relative h-full w-full bg-black">
+    <div className="relative h-full w-full bg-black">
       {post.video ? (
         <video src={post.video} controls className="h-full w-full object-cover" />
       ) : post.photo ? (
@@ -159,15 +156,6 @@ function PostMedia({ post, alt }: { post: Post; alt: string }) {
           </span>
         </div>
       )}
-
-      {/* single clean fade-in, no flashing */}
-      <motion.div
-        className="pointer-events-none absolute inset-0"
-        style={{ background: CARD_BG }}
-        initial={{ opacity: 1 }}
-        animate={inView ? { opacity: 0 } : { opacity: 1 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-      />
 
       {post.room && (
         <span className="absolute bottom-2 right-2 z-10 whitespace-nowrap rounded-full border border-white/15 bg-black/70 px-3 py-1.5 text-xs font-medium text-[#D7E2EA] backdrop-blur-sm">
