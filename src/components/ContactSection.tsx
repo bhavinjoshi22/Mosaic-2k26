@@ -1,14 +1,40 @@
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { User } from "lucide-react";
-import { motion } from "framer-motion";
 
-const TECH_TEAM = [
+type TechTeamMember = {
+  name: string;
+  photo?: string;
+  headName?: string;
+  mobile?: string;
+  email?: string;
+};
+
+const TECH_TEAM: TechTeamMember[] = [
   { name: "CSI", photo: "/CSI%20TECHHEAD.jpeg" },
-  { name: "ITSA" },
+  {
+    name: "ITSA",
+    headName: "Bhavin Joshi",
+    mobile: "8591601713",
+    email: "bhavinjoshi22032006@student.sfit.ac.in",
+  },
   { name: "ISTE", photo: "/ISTE%20TECHHEAD" },
   { name: "IEEE" },
-  { name: "IETE", photo: "/IETE%20TECHHEAD.jpeg" },
+  {
+    name: "IETE",
+    photo: "/IETE%20TECHHEAD.jpeg",
+    headName: "Soham Kadam",
+    mobile: "9870526618",
+    email: "sohamkadam440@student.sfit.ac.in",
+  },
   { name: "ADG" },
-  { name: "RAW", photo: "/RAW%20TECHHEAD" },
+  {
+    name: "RAW",
+    photo: "/RAW%20TECHHEAD",
+    headName: "Joshua Coutinho",
+    mobile: "8976357005",
+    email: "joshuacoutinho5@student.sfit.ac.in",
+  },
   { name: "GATEE" },
   { name: "TEJAS" },
   { name: "EESA" },
@@ -19,50 +45,58 @@ const TECH_TEAM = [
 ];
 
 function CommitteeCarousel() {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveIndex((index) => (index + 1) % TECH_TEAM.length);
+    }, 1500);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const committee = TECH_TEAM[activeIndex];
+
   return (
-    <motion.div
-      className="flex w-max"
-      animate={{ x: ["0%", "-50%"] }}
-      transition={{ duration: 34, repeat: Infinity, ease: "linear" }}
-    >
-      {[0, 1].map((copy) => (
-        <div
-          key={copy}
-          aria-hidden={copy === 1}
-          className="flex gap-4 px-2 py-2"
+    <div className="relative mx-auto min-h-[500px] w-[min(88vw,360px)] overflow-hidden sm:min-h-[520px]">
+      <AnimatePresence initial={false}>
+        <motion.article
+          key={committee.name}
+          initial={{ x: "100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "-100%" }}
+          transition={{ duration: 0.55, ease: "easeInOut" }}
+          className="absolute inset-0 overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900/50 p-3 text-center"
         >
-          {TECH_TEAM.map((committee) => (
-            <article
-              key={`${committee.name}-${copy}`}
-              className="w-[260px] max-w-[78vw] shrink-0 overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900/50 p-3 text-center"
-            >
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-widest text-white">
-                {committee.name}
-              </h3>
-              <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-lg border border-neutral-800 bg-neutral-800/50">
-                {committee.photo ? (
-                  <img
-                    src={committee.photo}
-                    alt={`${committee.name} Tech Head`}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                    onError={(event) => {
-                      event.currentTarget.style.display = "none";
-                      event.currentTarget.nextElementSibling?.classList.remove("hidden");
-                    }}
-                  />
-                ) : null}
-                <div className={`${committee.photo ? "hidden" : ""} flex flex-col items-center gap-2 text-neutral-500`}>
-                  <User className="h-8 w-8" />
-                  <span className="text-[10px] uppercase tracking-wider">Photo coming soon</span>
-                </div>
-              </div>
-              <p className="mt-2 text-xs text-neutral-500">Tech Head</p>
-            </article>
-          ))}
-        </div>
-      ))}
-    </motion.div>
+          <h3 className="mb-3 text-sm font-semibold uppercase tracking-widest text-white">
+            {committee.name}
+          </h3>
+          <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-lg border border-neutral-800 bg-neutral-800/50">
+            {committee.photo ? (
+              <img
+                src={committee.photo}
+                alt={`${committee.name} Tech Head`}
+                className="h-full w-full object-cover"
+                loading="lazy"
+                onError={(event) => {
+                  event.currentTarget.style.display = "none";
+                  event.currentTarget.nextElementSibling?.classList.remove("hidden");
+                }}
+              />
+            ) : null}
+            <div className={`${committee.photo ? "hidden" : ""} flex flex-col items-center gap-2 text-neutral-500`}>
+              <User className="h-8 w-8" />
+              <span className="text-[10px] uppercase tracking-wider">Photo coming soon</span>
+            </div>
+          </div>
+          <div className="mt-4 space-y-2 text-left text-sm">
+            <p className="text-white">{committee.headName || "Name not provided"}</p>
+            <p className="text-neutral-400">Mobile: {committee.mobile || "Not provided"}</p>
+            <p className="break-all text-neutral-400">Email: {committee.email || "Not provided"}</p>
+          </div>
+        </motion.article>
+      </AnimatePresence>
+    </div>
   );
 }
 
