@@ -32,7 +32,7 @@ const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
   },
   {
     name: 'ISTE',
-    posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '414' })),
+    posts: [{ photo: '/ISTE%20EVENT%20POSTER.jpeg', video: '', room: '414' }],
   },
   {
     name: 'IEEE',
@@ -62,9 +62,9 @@ const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
   {
     name: 'CODEX',
     posts: [
-      { photo: '/CODEX%20EVENT%20POSTER.png', video: '', room: '' },
-      { photo: '/CODEX%20EVENT%20POSTER%201.jpeg', video: '', room: '' },
-      { photo: '/CODEX%20EVENT%20POSTER%202.jpeg', video: '', room: '' },
+      { photo: '/CODEX%20EVENT%20POSTER%20web.jpg', video: '', room: '' },
+      { photo: '/CODEX%20EVENT%20POSTER%201%20web.jpg', video: '', room: '' },
+      { photo: '/CODEX%20EVENT%20POSTER%202%20web.jpg', video: '', room: '' },
     ],
   },
   {
@@ -75,7 +75,14 @@ const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
       { photo: '/E-TAN%20EVENT%20POSTER%202.jpeg', video: '', room: '' },
     ],
   },
-  { name: 'ECSSA', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
+  {
+    name: 'ECSSA',
+    posts: [
+      { photo: '/ECSSA%20EVENT%20POSTER.jpeg', video: '', room: '' },
+      { photo: '/ECSSA%20EVENT%20POSTER%201.jpeg', video: '', room: '' },
+      { photo: '/ECSSA%20EVENT%20POSTER%202.jpeg', video: '', room: '' },
+    ],
+  },
 ];
 
 const COMMITTEES: Project[] = COMMITTEE_DATA.map((committee, index) => ({
@@ -159,7 +166,7 @@ function PostMedia({ post, alt }: { post: Post; alt: string }) {
         post.photo.toLowerCase().endsWith('.pdf') ? (
           <iframe src={post.photo} title={alt} loading="lazy" className="h-full w-full border-0 bg-white" />
         ) : (
-          <img src={post.photo} alt={alt} className="h-full w-full object-contain" />
+          <img src={post.photo} alt={alt} loading="lazy" decoding="async" className="h-full w-full object-contain" />
         )
       ) : (
         <div className="flex h-full w-full items-center justify-center">
