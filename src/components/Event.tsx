@@ -51,7 +51,7 @@ const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
     posts: [
       { photo: '/ADG%20EVENT%20POSTER.jpeg', video: '', room: '028' },
       { photo: '/ADG%20EVENT%20POSTER%201.jpeg', video: '', room: '028' },
-      { photo: '/ADG%20EVENT%20POSTER%202.jpeg', video: '', room: '028' },
+      // { photo: '/ADG%20EVENT%20POSTER%202.jpeg', video: '', room: '028' },
     ],
   },
   { name: 'RAW', posts: [{ photo: '/RAW%20EVENT%20POSTER.png', video: '', room: '027' }] },
@@ -100,7 +100,7 @@ const WEBSITE_LINKS: Record<string, string> = {
   ADG: 'https://adg-game-reg.onrender.com/',
   EESA: 'https://eesaxsfit.netlify.app/',
   'E-TAN': 'https://lightslategrey-koala-269893.hostingersite.com/',
-  IETE: 'https://mosaic-conjuring-2026.vercel.app/',
+  IETE: 'https://iete-mosaic.vercel.app/',
   RAW: 'https://rawwebsite-seven.vercel.app/mosaic-26',
   ECSSA: 'https://ecssamosaic.pages.dev/',
   CODEX: 'https://codexsfit.vercel.app/mosaic',

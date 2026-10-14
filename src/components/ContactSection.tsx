@@ -47,7 +47,7 @@ const TECH_TEAM: TechTeamMember[] = [
     photo: "/ECSSA%20TECHHEAD.jpeg  ",
     headName: "Briva",
     mobile: "9326829981",
-    email: "briva@student.sfit.ac.in",
+    email: "Briva.10102@student.sfit.ac.in",
   },
 ]
 function CommitteeCarousel() {
