@@ -42,7 +42,7 @@ const TECH_TEAM: TechTeamMember[] = [
     photo: "/ETAN%20TECHHEAD.jpeg" ,
     headName: "Soham Pandit ",
     mobile: "90218 41341",
-    email: "bhaaratyadav7@student.sfit.ac.in",
+    email: "sohampandit.official@gmail.com",
   } ,
   { name: "CODEX", photo: "/CODEX%20TECHHEAD.jpeg" ,
     headName: "Gilmore Dsilva",
