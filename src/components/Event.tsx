@@ -57,7 +57,14 @@ const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
   { name: 'RAW', posts: [{ photo: '/RAW%20EVENT%20POSTER.png', video: '', room: '027' }] },
   { name: 'GATEE X TEJAS', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
   // { name: 'TEJAS', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
-  { name: 'EESA', posts: Array.from({ length: 3 }, () => ({ photo: '/public/EESA EVENT POSTER 1.png', video: '/public/EESA VIDEO.mp4', room: '230' })) },
+ {
+    name: 'EESA',
+    posts: [
+      { photo: '/public/EESA EVENT POSTER 1.png', video: '', room: '230' },
+      { photo: '', video: '/public/EESA VIDEO.mp4', room: '230' },
+      // { photo: '/CODEX%20EVENT%20POSTER%202%20web.jpg', video: '', room: '421/422' },
+    ],
+  },
   { name: 'MESA', posts: [{ photo: '/MESSA%20EVENT%20POSTER.jpeg', video: '', room: '006' }] },
   {
     name: 'CODEX',
