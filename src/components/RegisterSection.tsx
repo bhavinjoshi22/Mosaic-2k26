@@ -16,6 +16,8 @@ interface Registration {
   category: Category;
   college_name?: string | null;
   year?: string | null;
+  branch?: string | null;
+  division?: string | null;
   college_id_photo_url: string;
   person_photo_url: string;
 }
@@ -27,6 +29,16 @@ const YEARS = [
   { value: 'TE', label: 'TE — Third Year' },
   { value: 'BE', label: 'BE — Final Year' },
 ];
+const BRANCHES = [
+  { value: 'AIML', label: 'AIML' },
+  { value: 'ECS', label: 'ECS' },
+  { value: 'ELEC', label: 'ELEC' },
+  { value: 'EXTC', label: 'EXTC' },
+  { value: 'IT', label: 'IT' },
+  { value: 'CMPN', label: 'CMPN' },
+  { value: 'MECH', label: 'MECH' },
+];
+const DIVISIONS = ['A', 'B', 'C'];
 
 interface RegisterSectionProps {
   isOpen: boolean;
@@ -45,6 +57,8 @@ export default function RegisterSection({ isOpen, onClose }: RegisterSectionProp
   const [category, setCategory] = useState<Category>('SFIT');
   const [collegeName, setCollegeName] = useState(SFIT_COLLEGE);
   const [year, setYear] = useState('');
+  const [branch, setBranch] = useState('');
+  const [division, setDivision] = useState('');
   const [collegeIdFile, setCollegeIdFile] = useState<File | null>(null);
   const [personFile, setPersonFile] = useState<File | null>(null);
   const [collegeIdPreview, setCollegeIdPreview] = useState<string | null>(null);
@@ -105,8 +119,10 @@ export default function RegisterSection({ isOpen, onClose }: RegisterSectionProp
     setCategory(cat);
     if (cat === 'SFIT') {
       setCollegeName(SFIT_COLLEGE);
-    } else if (collegeName === SFIT_COLLEGE) {
-      setCollegeName('');
+    } else {
+      if (collegeName === SFIT_COLLEGE) setCollegeName('');
+      setBranch('');
+      setDivision('');
     }
   }
 
@@ -165,6 +181,11 @@ export default function RegisterSection({ isOpen, onClose }: RegisterSectionProp
       return;
     }
 
+    if (category === 'SFIT' && (!branch || !division)) {
+      setError('Please select your branch and division.');
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -195,6 +216,8 @@ export default function RegisterSection({ isOpen, onClose }: RegisterSectionProp
           category,
           collegeName: collegeName.trim(),
           year,
+          branch: category === 'SFIT' ? branch : null,
+          division: category === 'SFIT' ? division : null,
           collegeIdPhotoUrl: collegeIdUrl,
           personPhotoUrl: personUrl,
         },
@@ -496,6 +519,8 @@ export default function RegisterSection({ isOpen, onClose }: RegisterSectionProp
                           <p className="mt-1 text-sm font-medium uppercase tracking-wider text-[#D7E2EA]/80">
                             {registration.category}
                             {registration.year ? ` · ${registration.year}` : ''}
+                            {registration.branch ? ` · ${registration.branch}` : ''}
+                            {registration.division ? `-${registration.division}` : ''}
                           </p>
                         </div>
                         <div>
@@ -651,6 +676,58 @@ export default function RegisterSection({ isOpen, onClose }: RegisterSectionProp
                     </Field>
                   </div>
 
+                  {/* branch + division (SFIT only) */}
+                  {category === 'SFIT' && (
+                    <div className="grid gap-4 sm:grid-cols-[1.5fr_1fr]">
+                      <Field label="Branch" icon="branch">
+                        <select
+                          value={branch}
+                          onChange={(e) => setBranch(e.target.value)}
+                          className={`${inputClass} cursor-pointer appearance-none pr-9 [&>option]:bg-[#131315] [&>option]:text-[#D7E2EA] ${
+                            branch ? '' : 'text-[#D7E2EA]/30'
+                          }`}
+                          required
+                        >
+                          <option value="" disabled>
+                            Select branch
+                          </option>
+                          {BRANCHES.map((b) => (
+                            <option key={b.value} value={b.value}>
+                              {b.label}
+                            </option>
+                          ))}
+                        </select>
+                        <Icon
+                          name="chevron"
+                          className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#D7E2EA]/40"
+                        />
+                      </Field>
+                      <Field label="Division" icon="users">
+                        <select
+                          value={division}
+                          onChange={(e) => setDivision(e.target.value)}
+                          className={`${inputClass} cursor-pointer appearance-none pr-9 [&>option]:bg-[#131315] [&>option]:text-[#D7E2EA] ${
+                            division ? '' : 'text-[#D7E2EA]/30'
+                          }`}
+                          required
+                        >
+                          <option value="" disabled>
+                            Select div
+                          </option>
+                          {DIVISIONS.map((d) => (
+                            <option key={d} value={d}>
+                              {d}
+                            </option>
+                          ))}
+                        </select>
+                        <Icon
+                          name="chevron"
+                          className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#D7E2EA]/40"
+                        />
+                      </Field>
+                    </div>
+                  )}
+
                   {/* uploads */}
                   <div className="grid gap-4 sm:grid-cols-2">
                     <UploadBox
@@ -725,6 +802,8 @@ const ICONS: Record<string, string> = {
   cap: 'M22 10L12 5 2 10l10 5 10-5z M6 12v5c3 2 9 2 12 0v-5',
   chevron: 'M6 9l6 6 6-6',
   upload: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M17 8l-5-5-5 5 M12 3v12',
+  branch: 'M6 3v12 M18 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M18 9a9 9 0 0 1-9 9',
+  users: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M23 21v-2a4 4 0 0 0-3-3.9 M16 3.1a4 4 0 0 1 0 7.8',
 };
 
 function Icon({ name, className }: { name: string; className?: string }) {
