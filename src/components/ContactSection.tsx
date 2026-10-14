@@ -9,15 +9,15 @@ type TechTeamMember = {
 };
 
 const TECH_TEAM: TechTeamMember[] = [
-  { name: "CSI", photo: "/CSI%20TECHHEAD.jpeg" },
+  { name: "CSI", photo: "/CSI%20TECHHEAD.jpeg" ,headName:"Balaji Nadar",mobile:"9860365177" ,email:"balaji17nadar@student.sfit.ac.in"},
   {
     name: "ITSA",
-    photo: "/ITSA%20TECHHEAD.jpeg",
+    photo: "/ITSA%20TECHHEAD.jpg",
     headName: "Bhavin Joshi",
     mobile: "8591601713",
     email: "bhavinjoshi22032006@student.sfit.ac.in",
   },
-  { name: "ISTE", photo: "/ISTE%20TECHHEAD" },
+  { name: "ISTE", photo: "/ISTE%20TECHHEAD.png" ,headName:"Viraj Salunke",mobile:"9372437473" ,email:"virajsalunke192006@student.sfit.ac.in"},
   {
     name: "IETE",
     photo: "/IETE%20TECHHEAD.jpeg",
@@ -32,11 +32,24 @@ const TECH_TEAM: TechTeamMember[] = [
     mobile: "8976357005",
     email: "joshuacoutinho5@student.sfit.ac.in",
   },
-  { name: "EESA", photo: "/EESA%20TECHHEAD.jpeg" },
-  { name: "CODEX", photo: "/CODEX%20TECHHEAD.jpeg" },
-  { name: "ECSSA", photo: "/ECSSA%20TECHHEAD.jpeg" },
-];
-
+  { name: "EESA",
+    photo: "/EESA%20TECHHEAD.jpeg" ,
+    headName: "Bhaarat Yadav",
+    mobile: "8291600882",
+    email: "bhaaratyadav7@student.sfit.ac.in",
+  },
+  { name: "CODEX", photo: "/CODEX%20TECHHEAD.jpeg" ,
+    headName: "Gilmore Dsilva",
+    mobile: "9619469771",
+    email: "thegilmoredsilva@student.sfit.ac.in",
+  },
+  { name: "ECSSA",
+    photo: "/ECSSA%20TECHHEAD.jpeg  ",
+    headName: "Briva",
+    mobile: "9326829981",
+    email: "briva@student.sfit.ac.in",
+  },
+]
 function CommitteeCarousel() {
   const duplicatedTeam = [...TECH_TEAM, ...TECH_TEAM];
 
