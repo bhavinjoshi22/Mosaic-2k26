@@ -60,7 +60,7 @@ const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
  {
     name: 'EESA',
     posts: [
-      { photo: '/public/EESA EVENT POSTER 1.png', video: '', room: '230' },
+      { photo: '/EESA%20EVENT%20POSTER%201.png', video: '', room: '230' },
       { photo: '', video: '/public/EESA VIDEO.mp4', room: '230' },
       // { photo: '/CODEX%20EVENT%20POSTER%202%20web.jpg', video: '', room: '421/422' },
     ],
