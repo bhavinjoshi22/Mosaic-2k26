@@ -217,20 +217,78 @@ export default function VolunteerScanPage() {
     await lookupTicket(manualTicketId.trim());
   }
 
-  async function confirmEntry() {
-    if (!result) return;
-    setConfirming(true);
-    const { data, error } = await supabase.functions.invoke('scan-lookup', {
-      body: { ticketId: result.registration.entry_code, markCheckedIn: true },
-    });
-    setConfirming(false);
+  const confirmationLockRef = useRef(false);
+
+async function confirmEntry() {
+  if (!result || confirming || confirmationLockRef.current) return;
+
+  confirmationLockRef.current = true;
+  setConfirming(true);
+  setLookupError(null);
+
+  try {
+    const { data, error } = await supabase.functions.invoke(
+      'scan-lookup',
+      {
+        body: {
+          ticketId: result.registration.entry_code,
+          markCheckedIn: true,
+        },
+      }
+    );
+
     if (error) {
-      setLookupError(error.message);
+      throw new Error(error.message);
+    }
+
+    if (!data || data.error) {
+      throw new Error(data?.error || 'Check-in failed. Please try again.');
+    }
+
+    // Fetch the latest status after the check-in request.
+    const { data: refreshed, error: refreshError } =
+      await supabase.functions.invoke('scan-lookup', {
+        body: {
+          ticketId: result.registration.entry_code,
+          markCheckedIn: false,
+        },
+      });
+
+    if (refreshError) {
+      // The check-in request succeeded; keep its response visible.
+      setResult(data as ScanResult);
+      setLookupError(
+        'Check-in request succeeded, but status could not be refreshed. Please verify before retrying.'
+      );
       return;
     }
-    setResult(data as ScanResult);
-  }
 
+    if (!refreshed || refreshed.error) {
+      setResult(data as ScanResult);
+      setLookupError(
+        'Please verify the entry status before retrying.'
+      );
+      return;
+    }
+
+    setResult(refreshed as ScanResult);
+
+    if (!refreshed.alreadyCheckedIn) {
+      setLookupError(
+        'The check-in was not confirmed. Please check the backend response.'
+      );
+    }
+  } catch (err) {
+    setLookupError(
+      err instanceof Error
+        ? err.message
+        : 'Unable to complete check-in. Please try again.'
+    );
+  } finally {
+    confirmationLockRef.current = false;
+    setConfirming(false);
+  }
+}
   // ---------- render ----------
 
   if (authLoading && !info) {
