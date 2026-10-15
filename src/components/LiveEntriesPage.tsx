@@ -29,7 +29,7 @@ export default function LiveEntriesPage() {
 
     supabase
       .from('event_checkins')
-      .select('id, name, year, category, checked_in_at')
+      .select('id, name, year, category, branch, div, checked_in_at')
       .eq('committee', role)
       .order('checked_in_at', { ascending: false })
       .limit(1000)
