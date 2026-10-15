@@ -9,6 +9,8 @@ interface LiveCheckin {
   id: string;
   name: string;
   year: string | null;
+  branch: string | null;
+  div: string | null;
   category: string;
   checked_in_at: string;
 }
@@ -116,6 +118,9 @@ export default function LiveEntriesPage() {
               <th style={styles.th}>Name</th>
               <th style={styles.th}>Category</th>
               <th style={styles.th}>Year</th>
+              <th style={styles.th}>Branch</th>
+              <th style={styles.th}>Division</th>
+          
               <th style={styles.th}>Checked in</th>
             </tr>
           </thead>
@@ -133,6 +138,8 @@ export default function LiveEntriesPage() {
                 <td style={styles.tdName}>{c.name}</td>
                 <td style={styles.td}>{c.category}</td>
                 <td style={styles.td}>{c.year ?? '—'}</td>
+                <td style={styles.td}>{c.branch ?? '—'}</td>
+                <td style={styles.td}>{c.div ?? '—'}</td>
                 <td style={styles.tdMuted}>
                   {new Date(c.checked_in_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </td>
