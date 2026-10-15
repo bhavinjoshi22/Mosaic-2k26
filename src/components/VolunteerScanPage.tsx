@@ -22,7 +22,7 @@ interface ScanResult {
     mobile: string;
     category: string;
     year: string | null;
-    division: string | null;
+    div: string | null;
   branch: string | null;
     ticket_id: string;
     entry_code: string;
@@ -424,7 +424,7 @@ async function confirmEntry() {
   {result.registration.category}
   {result.registration.year ? ` · ${result.registration.year}` : ''}
   {result.registration.branch ? ` · ${result.registration.branch}` : ''}
-  {result.registration.division ? ` · Div ${result.registration.division}` : ''}
+  {result.registration.div ? ` · Div ${result.registration.div}` : ''}
 </p>
 <p style={styles.detail}>{result.registration.mobile}</p>
 <p style={styles.detail}>{result.registration.college_email}</p>
