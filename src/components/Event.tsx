@@ -19,59 +19,49 @@ interface Project {
 // Add only the event posters that exist for each committee.
 const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
   {
-    name: 'CSI',
-    posts: [{ photo: '/CSI%20GAME%20POSTER.png', video: '', room: 'Room 318' }],
-  },
-  {
-    name: 'ITSA',
-    posts: [
-      { photo: '/ITSA%20EVENT%20POSTER.jpeg', video: '', room: '304' },
-      { photo: '/ITSA%20EVENT%20POSTER%201.jpeg', video: '', room: '304' },
-      { photo: '/ITSA%20EVENT%20POSTER%202.jpeg', video: '', room: '304' },
-    ],
-  },
-  {
-    name: 'ISTE',
-    posts: [{ photo: '/ISTE%20EVENT%20POSTER.jpeg', video: '', room: '414' }],
-  },
-  {
     name: 'IEEE',
     posts: [{ photo: '/IEEE%20EVENT%20POSTER.jpeg', video: '', room: '620' }],
-  },
-  {
+  },{
+    name: 'CSI',
+    posts: [{ photo: '/CSI%20GAME%20POSTER.png', video: '', room: 'Room 318' }],
+  },{
     name: 'IETE',
     posts: [
       { photo: '/IETE%20EVENT%20POSTER%201.png', video: '', room: '514/515' },
       // { photo: '/IETE%20EVENT%20POSTER%202.png', video: '', room: '514/515' },
       // { photo: '/IETE%20EVENT%20POSTER%203.png', video: '', room: '514/515' },
     ],
-  },
-  {
+  }, {
+    name: 'ISTE',
+    posts: [{ photo: '/ISTE%20EVENT%20POSTER.jpeg', video: '', room: '414' }],
+  },{
     name: 'ADG',
     posts: [
       { photo: '/ADG%20EVENT%20POSTER.jpeg', video: '', room: '028' },
       { photo: '/ADG%20EVENT%20POSTER%201.jpeg', video: '', room: '028' },
       // { photo: '/ADG%20EVENT%20POSTER%202.jpeg', video: '', room: '028' },
     ],
-  },
-  { name: 'RAW', posts: [{ photo: '/RAW%20EVENT%20POSTER.png', video: '', room: '027' }] },
-  { name: 'GATEE X TEJAS', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
-  // { name: 'TEJAS', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
- {
-    name: 'EESA',
-    posts: [
-      { photo: '/EESA%20EVENT%20POSTER%201.png', video: '', room: '230' },
-      { photo: '', video: '/public/EESA VIDEO.mp4', room: '230' },
-      // { photo: '/CODEX%20EVENT%20POSTER%202%20web.jpg', video: '', room: '421/422' },
-    ],
-  },
-  { name: 'MESA', posts: [{ photo: '/MESSA%20EVENT%20POSTER.jpeg', video: '', room: '006' }] },
-  {
+  },{
     name: 'CODEX',
     posts: [
       { photo: '/CODEX%20EVENT%20POSTER%20web.jpg', video: '', room: '421/422' },
       { photo: '/CODEX%20EVENT%20POSTER%201%20web.jpg', video: '', room: '421/422' },
       { photo: '/CODEX%20EVENT%20POSTER%202%20web.jpg', video: '', room: '421/422' },
+    ],
+  },{
+    name: 'ECSSA',
+    posts: [
+      { photo: '/ECSSA%20EVENT%20POSTER.jpeg', video: '', room: '618' },
+      { photo: '/ECSSA%20EVENT%20POSTER%201.jpeg', video: '', room: '618' },
+      { photo: '/ECSSA%20EVENT%20POSTER%202.jpeg', video: '', room: '618' },
+    ],
+  },
+  {
+    name: 'EESA',
+    posts: [
+      { photo: '/EESA%20EVENT%20POSTER%201.png', video: '', room: '230' },
+      { photo: '', video: '/public/EESA VIDEO.mp4', room: '230' },
+      // { photo: '/CODEX%20EVENT%20POSTER%202%20web.jpg', video: '', room: '421/422' },
     ],
   },
   {
@@ -82,14 +72,27 @@ const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
       { photo: '/E-TAN%20EVENT%20POSTER%202.jpeg', video: '', room: '128' },
     ],
   },
+  { name: 'GATEE X TEJAS', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
   {
-    name: 'ECSSA',
+    name: 'ITSA',
     posts: [
-      { photo: '/ECSSA%20EVENT%20POSTER.jpeg', video: '', room: '618' },
-      { photo: '/ECSSA%20EVENT%20POSTER%201.jpeg', video: '', room: '618' },
-      { photo: '/ECSSA%20EVENT%20POSTER%202.jpeg', video: '', room: '618' },
+      { photo: '/ITSA%20EVENT%20POSTER.jpeg', video: '', room: '304' },
+      { photo: '/ITSA%20EVENT%20POSTER%201.jpeg', video: '', room: '304' },
+      { photo: '/ITSA%20EVENT%20POSTER%202.jpeg', video: '', room: '304' },
     ],
   },
+ 
+  { name: 'MESA', posts: [{ photo: '/MESSA%20EVENT%20POSTER.jpeg', video: '', room: '006' }] },
+  
+  
+  
+  { name: 'RAW', posts: [{ photo: '/RAW%20EVENT%20POSTER.png', video: '', room: '027' }] },
+  
+  // { name: 'TEJAS', posts: Array.from({ length: 3 }, () => ({ photo: '', video: '', room: '' })) },
+ 
+  
+  
+  
 ];
 
 const COMMITTEES: Project[] = COMMITTEE_DATA.map((committee, index) => ({
