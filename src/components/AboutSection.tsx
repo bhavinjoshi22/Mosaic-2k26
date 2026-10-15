@@ -107,7 +107,7 @@ export default function AboutSection() {
                   <div className="relative aspect-video w-full overflow-hidden">
                     <video
                       className="absolute inset-0 h-full w-full object-cover"
-                      src="/About-us.mp4"
+                      src="about.mp4"
                       poster="/image.jpeg"
                       autoPlay
                       muted
