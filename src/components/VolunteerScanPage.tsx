@@ -45,6 +45,8 @@ interface LiveCheckin {
   name: string;
   year: string | null;
   category: string;
+  branch: string | null;
+  div: string | null;
   checked_in_at: string;
 }
 
@@ -351,6 +353,8 @@ async function confirmEntry() {
                     <div style={styles.liveMeta}>
                       {c.category}
                       {c.year ? ` · ${c.year}` : ''}
+                      {c.branch ? ` · ${c.branch}` : ''}
+                      {c.div ? ` · Div ${c.div}` : ''}
                     </div>
                   </div>
                   <span style={styles.liveTime}>
