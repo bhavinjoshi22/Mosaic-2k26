@@ -22,8 +22,11 @@ interface ScanResult {
     mobile: string;
     category: string;
     year: string | null;
+    division: string | null;
+  branch: string | null;
     ticket_id: string;
     entry_code: string;
+
   };
   collegeIdPhotoUrl: string | null;
   personPhotoUrl: string | null;
@@ -417,11 +420,14 @@ async function confirmEntry() {
               <p style={styles.notice}>Not yet scanned at the main gate</p>
             )}
             <p style={styles.name}>{result.registration.name}</p>
-            <p style={styles.detail}>
-              {result.registration.category}
-              {result.registration.year ? ` · ${result.registration.year}` : ''} · {result.registration.mobile}
-            </p>
-            <p style={styles.detail}>{result.registration.college_email}</p>
+<p style={styles.detail}>
+  {result.registration.category}
+  {result.registration.year ? ` · ${result.registration.year}` : ''}
+  {result.registration.branch ? ` · ${result.registration.branch}` : ''}
+  {result.registration.division ? ` · Div ${result.registration.division}` : ''}
+</p>
+<p style={styles.detail}>{result.registration.mobile}</p>
+<p style={styles.detail}>{result.registration.college_email}</p>
           </div>
         )}
 
