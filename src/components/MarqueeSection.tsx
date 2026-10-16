@@ -12,7 +12,7 @@ const COMMITTEES = [
   { name: 'TEJAS', src: '/TEJAS%20TeamPhoto.jpeg' },
   { name: 'EESA', src: '/EESA%20TeamPhoto.jpeg' },
   { name: 'MESA', src: '/MESA%20TeamPhoto.jpeg' },
-  { name: 'CODEX', src: '/public/CODEX TeamPhoto.png' },
+  { name: 'CODEX', src: '/CODEX%20TeamPhoto.png' },
   { name: 'E-TAN', src: '/E-TAN%20TeamPhoto.jpeg' },
   { name: 'ECSSA', src: '/ECSSA%20TeamPhoto.webp' },
 ];
