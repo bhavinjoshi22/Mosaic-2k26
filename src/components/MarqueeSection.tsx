@@ -6,7 +6,7 @@ const COMMITTEES = [
   { name: 'ISTE', src: '/ISTE%20TeamPhoto.jpeg' },
   { name: 'IEEE', src: '/IEEE%20TeamPhoto.jpeg' },
   { name: 'IETE', src: '/IETE%20TeamPhoto.jpeg' },
-  { name: 'ADG', src: '/ADG%20TeamPhoto.png' },
+  { name: 'ADG', src: '/ADG%20TeamPhoto.webp' },
   { name: 'RAW', src: '/RAW%20TeamPhoto.jpeg' },
   { name: 'GATEE', src: '/GATEE%20TeamPhoto.jpeg' },
   { name: 'TEJAS', src: '/TEJAS%20TeamPhoto.jpeg' },
@@ -14,7 +14,7 @@ const COMMITTEES = [
   { name: 'MESA', src: '/MESA%20TeamPhoto.jpeg' },
   { name: 'CODEX', src: '/public/CODEX TeamPhoto.png' },
   { name: 'E-TAN', src: '/E-TAN%20TeamPhoto.jpeg' },
-  { name: 'ECSSA', src: '/ECSSA%20TeamPhoto.jpeg' },
+  { name: 'ECSSA', src: '/ECSSA%20TeamPhoto.webp' },
 ];
 
 const ROWS = [

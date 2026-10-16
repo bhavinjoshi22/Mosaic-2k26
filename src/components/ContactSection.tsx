@@ -9,7 +9,7 @@ type TechTeamMember = {
 };
 
 const TECH_TEAM: TechTeamMember[] = [
-  { name: "CSI", photo: "/CSI%20TECHHEAD.jpeg" ,headName:"Balaji Nadar",mobile:"9860365177" ,email:"balaji17nadar@student.sfit.ac.in"},
+  { name: "CSI", photo: "/CSI%20TECHHEAD.webp" ,headName:"Balaji Nadar",mobile:"9860365177" ,email:"balaji17nadar@student.sfit.ac.in"},
   {
     name: "ITSA",
     photo: "/ITSA%20TECHHEAD.jpg",

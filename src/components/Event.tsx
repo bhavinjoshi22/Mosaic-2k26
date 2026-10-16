@@ -28,7 +28,7 @@ const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
     name: 'IETE',
     posts: [
       { photo: '/IETE%20EVENT%20POSTER%201.png', video: '', room: '514/515' },
-      // { photo: '/IETE%20EVENT%20POSTER%202.png', video: '', room: '514/515' },
+      // { photo: '/IETE%20EVENT%20POSTER%202.pn', video: '', room: '514/515' },
       // { photo: '/IETE%20EVENT%20POSTER%203.png', video: '', room: '514/515' },
     ],
   }, {
@@ -44,8 +44,8 @@ const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
   },{
     name: 'CODEX',
     posts: [
-      { photo: '/CODEX%20EVENT%20POSTER%20web.jpg', video: '', room: '421/422' },
-      { photo: '/CODEX%20EVENT%20POSTER%201%20web.jpg', video: '', room: '421/422' },
+      { photo: '/CODEX%20EVENT%20POSTER%20web.webp', video: '', room: '421/422' },
+      { photo: '/CODEX%20EVENT%20POSTER%201%20web.webp', video: '', room: '421/422' },
       { photo: '/CODEX%20EVENT%20POSTER%202%20web.jpg', video: '', room: '421/422' },
     ],
   },{
