@@ -27,7 +27,7 @@ const COMMITTEE_DATA: { name: string; posts: Post[] }[] = [
   },{
     name: 'IETE',
     posts: [
-      { photo: '/IETE%20EVENT%20POSTER%201.png', video: '', room: '514/515' },
+      { photo: '/IETE%20EVENT%20POSTER%201.webp', video: '', room: '514/515' },
       // { photo: '/IETE%20EVENT%20POSTER%202.pn', video: '', room: '514/515' },
       // { photo: '/IETE%20EVENT%20POSTER%203.png', video: '', room: '514/515' },
     ],
