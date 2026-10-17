@@ -5,7 +5,6 @@ import { useRole } from '../hooks/roleCheck';
 
 interface LiveCheckin {
   id: string;
-  entry_code: string;
   name: string;
   year: string | null;
   branch: string | null;
@@ -14,142 +13,71 @@ interface LiveCheckin {
   checked_in_at: string;
   payment_method: 'cash' | 'upi' | null;
   note: string | null;
-  // Values for the committee's custom columns, keyed by column id.
-  extra: Record<string, string> | null;
-  stage_done: boolean;
-  day: number;
-}
-
-interface CommitteeColumn {
-  id: string;
-  label: string;
-  position: number;
 }
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
-// A text cell that saves itself. It saves when you click away or press Enter,
-// shows its own status, and never overwrites what you are typing when another
-// volunteer's edit arrives through realtime.
-function EditableCell({
-  value,
-  placeholder,
-  onSave,
-}: {
-  value: string;
-  placeholder?: string;
-  onSave: (v: string) => Promise<string | null>; // returns an error message or null
-}) {
-  const [text, setText] = useState(value);
-  const [saved, setSaved] = useState(value);
-  const [status, setStatus] = useState<SaveStatus>('idle');
-  const [err, setErr] = useState<string | null>(null);
-  const editing = useRef(false);
-
-  useEffect(() => {
-    if (!editing.current) {
-      setText(value);
-      setSaved(value);
-    }
-  }, [value]);
-
-  async function commit() {
-    editing.current = false;
-    if (text === saved) return;
-    setStatus('saving');
-    setErr(null);
-    const e = await onSave(text);
-    if (e) {
-      setStatus('error');
-      setErr(e);
-      return;
-    }
-    setSaved(text);
-    setStatus('saved');
-    setTimeout(() => setStatus((s) => (s === 'saved' ? 'idle' : s)), 1500);
-  }
-
-  return (
-    <>
-      <input
-        type="text"
-        value={text}
-        maxLength={500}
-        placeholder={placeholder}
-        onFocus={() => {
-          editing.current = true;
-        }}
-        onChange={(e) => setText(e.target.value)}
-        onBlur={() => void commit()}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
-        }}
-        style={styles.cellInput}
-      />
-      <div style={styles.saveStatus}>
-        {status === 'saving' && 'Saving…'}
-        {status === 'saved' && 'Saved ✓'}
-        {status === 'error' && <span style={{ color: '#f87171' }}>{err ?? 'Save failed'}</span>}
-      </div>
-    </>
-  );
-}
-
+// One table row. Payment and Note are editable here. The database function
+// update_checkin_details only lets committee volunteers change rows that
+// belong to their own committee, so this is enforced server-side as well.
 function CheckinRow({
   c,
   index,
   total,
   flash,
-  columns,
-  isManager,
-  onPatched,
+  onSaved,
 }: {
   c: LiveCheckin;
   index: number;
   total: number;
   flash: boolean;
-  columns: CommitteeColumn[];
-  isManager: boolean;
-  onPatched: (id: string, patch: Partial<LiveCheckin>) => void;
+  onSaved: (id: string, payment: 'cash' | 'upi' | null, note: string | null) => void;
 }) {
-  const [stageErr, setStageErr] = useState<string | null>(null);
   const [payment, setPayment] = useState<string>(c.payment_method ?? '');
-  const [payErr, setPayErr] = useState<string | null>(null);
+  const [note, setNote] = useState<string>(c.note ?? '');
+  const [savedNote, setSavedNote] = useState<string>(c.note ?? '');
+  const [status, setStatus] = useState<SaveStatus>('idle');
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const editingNote = useRef(false);
 
+  // Pick up edits made by another volunteer of the same committee (via
+  // realtime), but never overwrite what this person is typing right now.
   useEffect(() => {
     setPayment(c.payment_method ?? '');
-  }, [c.payment_method]);
+    if (!editingNote.current) {
+      setNote(c.note ?? '');
+      setSavedNote(c.note ?? '');
+    }
+  }, [c.payment_method, c.note]);
 
-  async function savePayment(next: string) {
-    setPayErr(null);
-    const p = (next || null) as 'cash' | 'upi' | null;
+  async function save(nextPayment: string, nextNote: string) {
+    setStatus('saving');
+    setErrorMsg(null);
+
+    const cleanNote = nextNote.trim() || null;
+    const cleanPayment = (nextPayment || null) as 'cash' | 'upi' | null;
+
     const { error } = await supabase.rpc('update_checkin_details', {
       p_id: c.id,
-      p_payment_method: p,
-      p_note: c.note,
+      p_payment_method: cleanPayment,
+      p_note: cleanNote,
     });
+
     if (error) {
-      setPayErr(error.message);
-      setPayment(c.payment_method ?? '');
+      setStatus('error');
+      setErrorMsg(error.message);
       return;
     }
-    onPatched(c.id, { payment_method: p });
-  }
 
-  async function toggleStage(next: boolean) {
-    setStageErr(null);
-    onPatched(c.id, { stage_done: next }); // show the tick immediately
-    const { error } = await supabase.rpc('set_stage_done', { p_id: c.id, p_done: next });
-    if (error) {
-      onPatched(c.id, { stage_done: !next }); // put it back if the save failed
-      setStageErr(error.message);
-    }
+    setSavedNote(nextNote);
+    onSaved(c.id, cleanPayment, cleanNote);
+    setStatus('saved');
+    setTimeout(() => setStatus((s) => (s === 'saved' ? 'idle' : s)), 1500);
   }
 
   return (
     <tr style={flash ? styles.trFlash : undefined}>
       <td style={styles.tdMuted}>{total - index}</td>
-      <td style={styles.tdMuted}>Day {c.day}</td>
       <td style={styles.tdName}>{c.name}</td>
       <td style={styles.td}>{c.category}</td>
       <td style={styles.td}>{c.year ?? '—'}</td>
@@ -159,22 +87,11 @@ function CheckinRow({
         {new Date(c.checked_in_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
       </td>
       <td style={styles.td}>
-        <input
-          type="checkbox"
-          checked={!!c.stage_done}
-          onChange={(e) => void toggleStage(e.target.checked)}
-          style={styles.checkbox}
-        />
-        {stageErr && <div style={{ ...styles.saveStatus, color: '#f87171' }}>{stageErr}</div>}
-      </td>
-      {!isManager && (
-        <>
-      <td style={styles.td}>
         <select
           value={payment}
           onChange={(e) => {
             setPayment(e.target.value);
-            void savePayment(e.target.value);
+            void save(e.target.value, note);
           }}
           style={styles.select}
         >
@@ -182,106 +99,44 @@ function CheckinRow({
           <option value="cash">Cash</option>
           <option value="upi">UPI</option>
         </select>
-        {payErr && <div style={{ ...styles.saveStatus, color: '#f87171' }}>{payErr}</div>}
       </td>
       <td style={styles.td}>
-        <EditableCell
-          value={c.note ?? ''}
+        <input
+          type="text"
+          value={note}
+          maxLength={500}
           placeholder="Add a note…"
-          onSave={async (v) => {
-            const note = v.trim() || null;
-            const { error } = await supabase.rpc('update_checkin_details', {
-              p_id: c.id,
-              p_payment_method: c.payment_method,
-              p_note: note,
-            });
-            if (error) return error.message;
-            onPatched(c.id, { note });
-            return null;
+          onFocus={() => {
+            editingNote.current = true;
           }}
+          onChange={(e) => setNote(e.target.value)}
+          onBlur={() => {
+            editingNote.current = false;
+            if (note !== savedNote) void save(payment, note);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+          }}
+          style={styles.noteInput}
         />
+        <div style={styles.saveStatus}>
+          {status === 'saving' && 'Saving…'}
+          {status === 'saved' && 'Saved ✓'}
+          {status === 'error' && <span style={{ color: '#f87171' }}>{errorMsg ?? 'Save failed'}</span>}
+        </div>
       </td>
-      {columns.map((col) => (
-        <td key={col.id} style={styles.td}>
-          <EditableCell
-            value={c.extra?.[col.id] ?? ''}
-            onSave={async (v) => {
-              const { error } = await supabase.rpc('update_checkin_extra', {
-                p_id: c.id,
-                p_key: col.id,
-                p_value: v,
-              });
-              if (error) return error.message;
-              const next = { ...(c.extra ?? {}) };
-              if (v.trim()) next[col.id] = v;
-              else delete next[col.id];
-              onPatched(c.id, { extra: next });
-              return null;
-            }}
-          />
-        </td>
-      ))}
-        </>
-      )}
     </tr>
   );
-}
-
-function csvCell(v: unknown) {
-  let s = String(v ?? '');
-  // Stop Excel/Sheets from running text that starts with = + - @ as a formula.
-  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
-  return `"${s.replace(/"/g, '""')}"`;
 }
 
 export default function LiveEntriesPage() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
   const { info, pending } = useRole();
-  const volunteerRole: string | null = info?.isVolunteer ? (info.role ?? null) : null;
-  // Stage managers are NOT in the volunteers table, so they cannot scan.
-  // They are listed in stage_managers and may only view the list and tick Stage.
-  const [managerCommittee, setManagerCommittee] = useState<string | null>(null);
-  const [managerChecked, setManagerChecked] = useState(false);
-  const role: string | null = volunteerRole ?? managerCommittee;
-  const isManager = !volunteerRole && !!managerCommittee;
+  const role: string | null = info?.isVolunteer ? (info.role ?? null) : null;
   const roleChecked = !!info || !pending;
-
-  // If the account is not a volunteer, check whether it is a stage manager.
-  useEffect(() => {
-    if (authLoading || !user || !roleChecked) return;
-    if (volunteerRole) {
-      setManagerChecked(true);
-      return;
-    }
-    let cancelled = false;
-    supabase
-      .from('stage_managers')
-      .select('committee')
-      .maybeSingle()
-      .then(({ data }) => {
-        if (cancelled) return;
-        setManagerCommittee(data?.committee ?? null);
-        setManagerChecked(true);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [user?.id, authLoading, roleChecked, volunteerRole]);
   const [checkins, setCheckins] = useState<LiveCheckin[]>([]);
-  const [columns, setColumns] = useState<CommitteeColumn[]>([]);
   const [loaded, setLoaded] = useState(false);
-  const [loadError, setLoadError] = useState<string | null>(null);
   const [flashId, setFlashId] = useState<string | null>(null);
-  const [dayFilter, setDayFilter] = useState<number | 'all'>('all');
-
-  async function loadColumns(r: string) {
-    const { data } = await supabase
-      .from('committee_columns')
-      .select('id, label, position')
-      .eq('committee', r)
-      .order('position', { ascending: true });
-    if (data) setColumns(data as CommitteeColumn[]);
-  }
 
   useEffect(() => {
     if (!role || role === 'gate' || !user) return;
@@ -290,22 +145,15 @@ export default function LiveEntriesPage() {
 
     supabase
       .from('event_checkins')
-      .select('id, entry_code, name, year, category, branch, div, checked_in_at, payment_method, note, extra, stage_done, day')
+      .select('id, name, year, category, branch, div, checked_in_at, payment_method, note')
       .eq('committee', role)
       .order('checked_in_at', { ascending: false })
       .limit(1000)
-      .then(({ data, error }) => {
-        if (cancelled) return;
-        if (error) {
-          setLoadError(error.message);
-          return;
-        }
-        setLoadError(null);
-        setCheckins((data ?? []) as LiveCheckin[]);
+      .then(({ data }) => {
+        if (cancelled || !data) return;
+        setCheckins(data as LiveCheckin[]);
         setLoaded(true);
       });
-
-    if (!isManager) void loadColumns(role);
 
     const channel = supabase
       .channel(`event_checkins-live-${role}`)
@@ -327,14 +175,6 @@ export default function LiveEntriesPage() {
           setCheckins((prev) => prev.map((c) => (c.id === row.id ? { ...c, ...row } : c)));
         }
       )
-      // Any column added, renamed or deleted by a teammate: reload the list.
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'committee_columns', filter: `committee=eq.${role}` },
-        () => {
-          void loadColumns(role);
-        }
-      )
       .subscribe();
 
     return () => {
@@ -343,64 +183,10 @@ export default function LiveEntriesPage() {
     };
   }, [role, user?.id]);
 
-  function handlePatched(id: string, patch: Partial<LiveCheckin>) {
-    setCheckins((prev) => prev.map((c) => (c.id === id ? { ...c, ...patch } : c)));
-  }
-
-  async function addColumn() {
-    const label = window.prompt('New column name (for example: Stage, Round, Score)');
-    if (!label || !label.trim() || !role) return;
-    const { error } = await supabase.rpc('add_committee_column', { p_label: label.trim() });
-    if (error) {
-      window.alert(error.message);
-      return;
-    }
-    await loadColumns(role);
-  }
-
-  async function deleteColumn(col: CommitteeColumn) {
-    if (!role) return;
-    if (!window.confirm(`Delete the column "${col.label}" and everything typed in it?`)) return;
-    const { error } = await supabase.rpc('delete_committee_column', { p_id: col.id });
-    if (error) {
-      window.alert(error.message);
-      return;
-    }
+  function handleSaved(id: string, payment: 'cash' | 'upi' | null, note: string | null) {
     setCheckins((prev) =>
-      prev.map((c) => {
-        if (!c.extra || !(col.id in c.extra)) return c;
-        const next = { ...c.extra };
-        delete next[col.id];
-        return { ...c, extra: next };
-      })
+      prev.map((c) => (c.id === id ? { ...c, payment_method: payment, note } : c))
     );
-    await loadColumns(role);
-  }
-
-  function downloadCsv() {
-    const header = [
-      'entry_code', 'day', 'name', 'category', 'year', 'branch', 'division',
-      'checked_in', 'payment', 'note', ...columns.map((c) => c.label),
-    ];
-    const lines = (dayFilter === 'all' ? checkins : checkins.filter((c) => c.day === dayFilter))
-      .slice()
-      .reverse()
-      .map((c) =>
-        [
-          c.entry_code, c.day, c.name, c.category, c.year, c.branch, c.div,
-          new Date(c.checked_in_at).toLocaleString(), c.payment_method, c.note,
-          ...columns.map((col) => c.extra?.[col.id] ?? ''),
-        ]
-          .map(csvCell)
-          .join(',')
-      );
-    const csv = '\ufeff' + [header.map(csvCell).join(','), ...lines].join('\n');
-    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${role}-registrations-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
   }
 
   // ---------- auth / role gates ----------
@@ -421,10 +207,6 @@ export default function LiveEntriesPage() {
     );
   }
 
-  if (!role && !managerChecked) {
-    return <div style={styles.centered}>Loading…</div>;
-  }
-
   if (!role) {
     return (
       <div style={styles.centered}>
@@ -443,10 +225,7 @@ export default function LiveEntriesPage() {
     );
   }
 
-  // ---------- committee table ----------
-
-  const days = Array.from(new Set(checkins.map((c) => c.day))).sort((a, b) => a - b);
-  const visible = dayFilter === 'all' ? checkins : checkins.filter((c) => c.day === dayFilter);
+  // ---------- committee table (committee volunteers only) ----------
 
   return (
     <div style={styles.page}>
@@ -456,35 +235,7 @@ export default function LiveEntriesPage() {
           <span style={styles.liveLabel}>LIVE</span>
         </div>
         <h1 style={styles.committeeName}>{role} — Registrations</h1>
-        {!isManager && (
-          <>
-            <button onClick={addColumn} style={styles.headerButton}>
-              + Column
-            </button>
-            <button onClick={downloadCsv} style={styles.headerButton}>
-              CSV
-            </button>
-          </>
-        )}
-        <span style={styles.countBadge}>{loaded ? visible.length : '…'}</span>
-      </div>
-
-      {loadError && (
-        <p style={{ color: '#f87171', fontSize: 13, padding: '12px 24px', margin: 0 }}>
-          Could not load registrations: {loadError}
-        </p>
-      )}
-
-      <div style={styles.dayTabs}>
-        {(['all', ...days] as Array<number | 'all'>).map((d) => (
-          <button
-            key={String(d)}
-            onClick={() => setDayFilter(d)}
-            style={dayFilter === d ? styles.dayTabActive : styles.dayTab}
-          >
-            {d === 'all' ? 'All days' : `Day ${d}`}
-          </button>
-        ))}
+        <span style={styles.countBadge}>{loaded ? checkins.length : '…'}</span>
       </div>
 
       <div style={styles.tableWrap}>
@@ -492,52 +243,32 @@ export default function LiveEntriesPage() {
           <thead>
             <tr>
               <th style={styles.th}>#</th>
-              <th style={styles.th}>Day</th>
               <th style={styles.th}>Name</th>
               <th style={styles.th}>Category</th>
               <th style={styles.th}>Year</th>
               <th style={styles.th}>Branch</th>
               <th style={styles.th}>Division</th>
               <th style={styles.th}>Checked in</th>
-              <th style={styles.th}>Stage</th>
-              {!isManager && (
-                <>
               <th style={styles.th}>Payment</th>
               <th style={styles.th}>Note</th>
-              {columns.map((col) => (
-                <th key={col.id} style={styles.th}>
-                  {col.label}
-                  <button
-                    onClick={() => void deleteColumn(col)}
-                    title="Delete column"
-                    style={styles.deleteColButton}
-                  >
-                    ×
-                  </button>
-                </th>
-              ))}
-                </>
-              )}
             </tr>
           </thead>
           <tbody>
-            {loaded && visible.length === 0 && (
+            {loaded && checkins.length === 0 && (
               <tr>
-                <td style={styles.tdEmpty} colSpan={isManager ? 9 : 11 + columns.length}>
+                <td style={styles.tdEmpty} colSpan={9}>
                   Waiting for the first check-in…
                 </td>
               </tr>
             )}
-            {visible.map((c, i) => (
+            {checkins.map((c, i) => (
               <CheckinRow
                 key={c.id}
                 c={c}
                 index={i}
-                total={visible.length}
+                total={checkins.length}
                 flash={flashId === c.id}
-                columns={columns}
-                isManager={isManager}
-                onPatched={handlePatched}
+                onSaved={handleSaved}
               />
             ))}
           </tbody>
@@ -559,14 +290,13 @@ const styles: Record<string, React.CSSProperties> = {
   header: {
     display: 'flex',
     alignItems: 'center',
-    gap: 12,
+    gap: 16,
     padding: '18px 24px',
     borderBottom: '1px solid #262626',
     position: 'sticky',
     top: 0,
     background: '#0C0C0C',
-    zIndex: 2,
-    flexWrap: 'wrap',
+    zIndex: 1,
   },
   headerLeft: { display: 'flex', alignItems: 'center', gap: 8 },
   liveDot: {
@@ -578,15 +308,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
   liveLabel: { fontSize: 11, fontWeight: 800, letterSpacing: 2, color: '#4ade80' },
   committeeName: { flex: 1, fontSize: 18, fontWeight: 700, textTransform: 'uppercase', margin: 0, letterSpacing: 0.3 },
-  headerButton: {
-    background: 'transparent',
-    border: '1px solid #444',
-    color: '#EAEAEA',
-    borderRadius: 8,
-    padding: '6px 12px',
-    fontSize: 12,
-    cursor: 'pointer',
-  },
   countBadge: {
     fontSize: 13,
     fontWeight: 800,
@@ -609,16 +330,6 @@ const styles: Record<string, React.CSSProperties> = {
     position: 'sticky',
     top: 0,
     background: '#0C0C0C',
-    whiteSpace: 'nowrap',
-  },
-  deleteColButton: {
-    marginLeft: 8,
-    background: 'transparent',
-    border: 'none',
-    color: '#737373',
-    cursor: 'pointer',
-    fontSize: 14,
-    lineHeight: 1,
   },
   td: { padding: '10px 12px', borderBottom: '1px solid #1a1a1a', verticalAlign: 'top' },
   tdName: { padding: '10px 12px', borderBottom: '1px solid #1a1a1a', fontWeight: 600, verticalAlign: 'top' },
@@ -639,9 +350,9 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#EAEAEA',
     fontSize: 13,
   },
-  cellInput: {
+  noteInput: {
     width: '100%',
-    minWidth: 160,
+    minWidth: 200,
     background: '#151515',
     border: '1px solid #333',
     borderRadius: 8,
@@ -650,27 +361,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 13,
   },
   saveStatus: { fontSize: 11, color: '#737373', marginTop: 4, minHeight: 14 },
-  checkbox: { width: 22, height: 22, cursor: 'pointer', accentColor: '#E3A24C' },
-  dayTabs: { display: 'flex', gap: 8, padding: '12px 24px 4px', flexWrap: 'wrap' },
-  dayTab: {
-    background: 'transparent',
-    border: '1px solid #333',
-    color: '#A3A3A3',
-    borderRadius: 999,
-    padding: '5px 14px',
-    fontSize: 12,
-    cursor: 'pointer',
-  },
-  dayTabActive: {
-    background: '#E3A24C',
-    border: '1px solid #E3A24C',
-    color: '#0C0C0C',
-    borderRadius: 999,
-    padding: '5px 14px',
-    fontSize: 12,
-    fontWeight: 700,
-    cursor: 'pointer',
-  },
   centered: {
     minHeight: '100vh',
     display: 'flex',
